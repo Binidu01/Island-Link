@@ -1,0 +1,460 @@
+'use client'
+
+import { onAuthStateChanged, signOut } from 'firebase/auth'
+import { User } from 'firebase/auth'
+import { doc, getDoc } from 'firebase/firestore'
+import { useEffect, useState } from 'react'
+
+import { auth, db } from '../lib/firebase'
+
+export default function AdminNavbar() {
+  const [user, setUser] = useState<User | null>(null)
+  const [userPhoto, setUserPhoto] = useState<string>('')
+  const [userName, setUserName] = useState<string>('')
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser)
+
+      if (currentUser) {
+        try {
+          // First set the Firebase Auth data as fallback
+          setUserPhoto(currentUser.photoURL || '')
+          setUserName(currentUser.displayName || currentUser.email?.split('@')[0] || 'Admin')
+
+          // Try to get more detailed data from Firestore
+          const userDocRef = doc(db, 'users', currentUser.uid)
+          const userDoc = await getDoc(userDocRef)
+
+          if (userDoc.exists()) {
+            const userData = userDoc.data()
+            // Only update if we have better data from Firestore
+            if (userData.photoURL && userData.photoURL !== '') {
+              setUserPhoto(userData.photoURL)
+            }
+            if (userData.fullName && userData.fullName !== '') {
+              setUserName(userData.fullName)
+            } else if (userData.email && userData.email !== '') {
+              setUserName(userData.email.split('@')[0])
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error)
+          // Keep the Firebase Auth data as fallback
+        }
+      } else {
+        setUserPhoto('')
+        setUserName('')
+      }
+
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  async function handleLogout() {
+    try {
+      await signOut(auth)
+      setShowProfileMenu(false)
+      window.location.href = '/login'
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
+  // Get user display name with fallbacks
+  const getUserDisplayName = () => {
+    if (userName && userName !== '') return userName
+    if (user?.displayName) return user.displayName
+    if (user?.email) return user.email.split('@')[0]
+    return 'Admin'
+  }
+
+  // Get user photo with fallbacks
+  const getUserPhoto = () => {
+    if (userPhoto && userPhoto !== '') return userPhoto
+    if (user?.photoURL) return user.photoURL
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(getUserDisplayName())}&background=random`
+  }
+
+  return (
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo & Title */}
+          <a href="/admin" className="flex items-center gap-3 group">
+            <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center group-hover:scale-105 transition">
+              <img
+                src="/favicon.png"
+                alt="IslandLink"
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none'
+                  const parent = e.currentTarget.parentElement
+                  if (parent) {
+                    parent.innerHTML =
+                      '<div class="h-10 w-10 rounded-xl bg-linear-to-br from-orange-500 via-cyan-500 to-green-500 flex items-center justify-center font-black text-white text-xl">IL</div>'
+                  }
+                }}
+              />
+            </div>
+            <div className="leading-tight hidden sm:block">
+              <div className="font-bold bg-linear-to-r from-orange-500 via-cyan-500 to-green-500 bg-clip-text text-transparent">
+                IslandLink Admin
+              </div>
+              <div className="text-xs text-gray-500">Management Portal</div>
+            </div>
+          </a>
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-1">
+            <a
+              href="/admin"
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                />
+              </svg>
+              Dashboard
+            </a>
+            <a
+              href="/manage-users"
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+              Users
+            </a>
+            <a
+              href="/manage-products"
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                />
+              </svg>
+              Products
+            </a>
+            <a
+              href="/manage-orders"
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              Orders
+            </a>
+            <a
+              href="/reports"
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              Reports
+            </a>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            aria-label={showMobileMenu ? 'Close menu' : 'Open menu'}
+            className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition"
+          >
+            <svg
+              className="w-6 h-6 text-gray-700"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              {showMobileMenu ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </svg>
+          </button>
+
+          {/* User Section */}
+          <div className="hidden lg:flex items-center gap-2">
+            {loading ? (
+              <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse" />
+            ) : user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 transition"
+                >
+                  <img
+                    src={getUserPhoto()}
+                    alt={getUserDisplayName()}
+                    className="h-10 w-10 rounded-full object-cover object-top border-2 border-gray-200"
+                    onError={(e) => {
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(getUserDisplayName())}&background=random`
+                    }}
+                  />
+                  <div className="hidden md:block text-left">
+                    <p className="text-sm font-semibold text-gray-900">{getUserDisplayName()}</p>
+                    <p className="text-xs text-gray-500">Administrator</p>
+                  </div>
+                  <svg
+                    className="w-4 h-4 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {showProfileMenu && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
+
+                    <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-gray-200 bg-white shadow-xl z-50 overflow-hidden">
+                      <div className="p-4 border-b border-gray-200 bg-linear-to-br from-orange-50 via-cyan-50 to-green-50">
+                        <p className="font-semibold text-gray-900">{getUserDisplayName()}</p>
+                        <p className="text-xs text-gray-600 truncate">{user.email}</p>
+                        <span className="inline-block mt-2 px-2 py-1 rounded-full text-xs font-semibold bg-linear-to-r from-orange-500 to-orange-600 text-white">
+                          Administrator
+                        </span>
+                      </div>
+
+                      <div className="p-2">
+                        <a
+                          href="/profile"
+                          className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-gray-100 transition text-gray-700"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
+                          <span className="text-sm">My Profile</span>
+                        </a>
+                        <a
+                          href="/audit"
+                          className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-gray-100 transition text-gray-700"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                          <span className="text-sm">Audit Logs</span>
+                        </a>
+                      </div>
+
+                      <div className="p-2 border-t border-gray-200">
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-red-50 hover:text-red-600 transition w-full text-left text-gray-700"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                            />
+                          </svg>
+                          <span className="text-sm">Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <a
+                href="/login"
+                className="px-5 py-2 rounded-xl bg-linear-to-r from-cyan-400 to-blue-500 text-white text-sm font-bold hover:from-cyan-500 hover:to-blue-600 transition shadow-sm"
+              >
+                Login
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="lg:hidden border-t border-gray-200 py-4 space-y-2">
+            <a
+              href="/admin"
+              className="flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                />
+              </svg>
+              Dashboard
+            </a>
+            <a
+              href="/manage-users"
+              className="flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+              Users
+            </a>
+            <a
+              href="/manage-products"
+              className="flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                />
+              </svg>
+              Products
+            </a>
+            <a
+              href="/manage-orders"
+              className="flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              Orders
+            </a>
+            <a
+              href="/reports"
+              className="flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:text-cyan-600 transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              Reports
+            </a>
+
+            {user && (
+              <>
+                <div className="border-t border-gray-200 my-2"></div>
+                <div className="px-4 py-2">
+                  <div className="flex items-center gap-3 mb-3">
+                    <img
+                      src={getUserPhoto()}
+                      alt={getUserDisplayName()}
+                      className="h-10 w-10 rounded-full object-cover object-top border-2 border-gray-200"
+                      onError={(e) => {
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(getUserDisplayName())}&background=random`
+                      }}
+                    />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{getUserDisplayName()}</p>
+                      <p className="text-xs text-gray-500">Administrator</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-orange-500 to-orange-600 text-white font-semibold hover:from-orange-600 hover:to-orange-700 transition"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </nav>
+  )
+}

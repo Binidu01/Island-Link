@@ -1,0 +1,45 @@
+{
+  "name": "island-link",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite --host --open",
+    "build": "tsc --noEmit && vite build",
+    "export": "vite build --mode export",
+    "start": "bini-server",
+    "preview": "vite preview --host --open",
+    "type-check": "tsc --noEmit",
+    "lint": "oxlint src",
+    "format": "oxfmt src",
+    "check": "oxlint src && oxfmt src && tsc --noEmit"
+  },
+  "dependencies": {
+    "avatar64": "^1.1.0",
+    "bini-overlay": "latest",
+    "bini-router": "latest",
+    "bini-server": "latest",
+    "firebase": "^12.12.1",
+    "hono": "latest",
+    "leaflet": "^1.9.4",
+    "nodemailer": "^8.0.5",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-router-dom": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "latest",
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "latest",
+    "@types/nodemailer": "^8.0.0",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "bini-env": "latest",
+    "bini-export": "latest",
+    "oxfmt": "latest",
+    "oxlint": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  }
+}
