@@ -835,312 +835,336 @@ export default function ProductQAPage() {
         </div>
       </div>
 
-      {/* Product Modal */}
+      {/* Product Modal with Blur */}
       {showProductModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold text-gray-900 truncate">
-                  {selectedProduct.name}
-                </h2>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  {selectedProduct.category}
-                </span>
-              </div>
-              <button
-                onClick={closeProductModal}
-                aria-label="Close modal"
-                className="p-2 hover:bg-gray-100 rounded-lg transition"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6">
-              <div className="flex flex-col lg:flex-row gap-6">
-                {/* Product Image */}
-                <div className="lg:w-2/5">
-                  <div className="bg-gray-100 rounded-xl overflow-hidden">
-                    {selectedProduct.imageURL ? (
-                      <img
-                        src={selectedProduct.imageURL}
-                        alt={selectedProduct.name}
-                        className="w-full h-auto max-h-96 object-contain"
-                      />
-                    ) : (
-                      <div className="w-full h-64 flex items-center justify-center bg-linear-to-br from-gray-200 to-gray-300">
-                        <svg
-                          className="w-16 h-16 text-gray-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={closeProductModal}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl font-bold text-gray-900 truncate">
+                    {selectedProduct.name}
+                  </h2>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    {selectedProduct.category}
+                  </span>
                 </div>
+                <button
+                  onClick={closeProductModal}
+                  aria-label="Close modal"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition"
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
 
-                {/* Product Details */}
-                <div className="lg:w-3/5">
-                  <div className="mb-6">
-                    <label className="text-sm font-medium text-gray-600">Description</label>
-                    <p className="mt-2 text-gray-900">{selectedProduct.description}</p>
+              {/* Modal Content */}
+              <div className="p-6">
+                <div className="flex flex-col lg:flex-row gap-6">
+                  {/* Product Image */}
+                  <div className="lg:w-2/5">
+                    <div className="bg-gray-100 rounded-xl overflow-hidden">
+                      {selectedProduct.imageURL ? (
+                        <img
+                          src={selectedProduct.imageURL}
+                          alt={selectedProduct.name}
+                          className="w-full h-auto max-h-96 object-contain"
+                        />
+                      ) : (
+                        <div className="w-full h-64 flex items-center justify-center bg-linear-to-br from-gray-200 to-gray-300">
+                          <svg
+                            className="w-16 h-16 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <div className="bg-linear-to-br from-blue-50 to-blue-100 p-4 rounded-xl">
-                      <label className="text-sm font-medium text-gray-600">Price</label>
-                      <p className="text-2xl font-bold text-gray-900 mt-1">
-                        {formatCurrency(selectedProduct.price)}
-                      </p>
+                  {/* Product Details */}
+                  <div className="lg:w-3/5">
+                    <div className="mb-6">
+                      <label className="text-sm font-medium text-gray-600">Description</label>
+                      <p className="mt-2 text-gray-900">{selectedProduct.description}</p>
                     </div>
 
-                    <div
-                      className={`p-4 rounded-xl ${
-                        selectedProduct.stock > 50
-                          ? 'bg-linear-to-br from-green-50 to-green-100'
-                          : selectedProduct.stock > 10
-                            ? 'bg-linear-to-br from-yellow-50 to-yellow-100'
-                            : 'bg-linear-to-br from-red-50 to-red-100'
-                      }`}
-                    >
-                      <label className="text-sm font-medium text-gray-600">Stock</label>
-                      <p className="text-2xl font-bold text-gray-900 mt-1">
-                        {selectedProduct.stock} units
-                      </p>
-                      <p
-                        className={`text-xs font-medium mt-1 ${
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                      <div className="bg-linear-to-br from-blue-50 to-blue-100 p-4 rounded-xl">
+                        <label className="text-sm font-medium text-gray-600">Price</label>
+                        <p className="text-2xl font-bold text-gray-900 mt-1">
+                          {formatCurrency(selectedProduct.price)}
+                        </p>
+                      </div>
+
+                      <div
+                        className={`p-4 rounded-xl ${
                           selectedProduct.stock > 50
-                            ? 'text-green-700'
+                            ? 'bg-linear-to-br from-green-50 to-green-100'
                             : selectedProduct.stock > 10
-                              ? 'text-yellow-700'
-                              : 'text-red-700'
+                              ? 'bg-linear-to-br from-yellow-50 to-yellow-100'
+                              : 'bg-linear-to-br from-red-50 to-red-100'
                         }`}
                       >
-                        {selectedProduct.stock > 50
-                          ? 'In Stock'
-                          : selectedProduct.stock > 10
-                            ? 'Low Stock'
-                            : 'Critical Stock'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">SKU</label>
-                      <p className="mt-1 font-mono text-gray-900 bg-gray-100 px-3 py-2 rounded-lg">
-                        {selectedProduct.sku}
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">RDC Location</label>
-                      <div className="mt-1">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                          {selectedProduct.rdcLocation}
-                        </span>
+                        <label className="text-sm font-medium text-gray-600">Stock</label>
+                        <p className="text-2xl font-bold text-gray-900 mt-1">
+                          {selectedProduct.stock} units
+                        </p>
+                        <p
+                          className={`text-xs font-medium mt-1 ${
+                            selectedProduct.stock > 50
+                              ? 'text-green-700'
+                              : selectedProduct.stock > 10
+                                ? 'text-yellow-700'
+                                : 'text-red-700'
+                          }`}
+                        >
+                          {selectedProduct.stock > 50
+                            ? 'In Stock'
+                            : selectedProduct.stock > 10
+                              ? 'Low Stock'
+                              : 'Critical Stock'}
+                        </p>
                       </div>
                     </div>
 
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Minimum Stock Level
-                      </label>
-                      <p className="mt-1 text-lg font-bold text-gray-900">
-                        {selectedProduct.minStockLevel || 10} units
-                      </p>
-                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">SKU</label>
+                        <p className="mt-1 font-mono text-gray-900 bg-gray-100 px-3 py-2 rounded-lg">
+                          {selectedProduct.sku}
+                        </p>
+                      </div>
 
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Last Updated</label>
-                      <p className="mt-1 text-gray-900">
-                        {formatTimestamp(selectedProduct.updatedAt || selectedProduct.createdAt)}
-                      </p>
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">RDC Location</label>
+                        <div className="mt-1">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                            {selectedProduct.rdcLocation}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">
+                          Minimum Stock Level
+                        </label>
+                        <p className="mt-1 text-lg font-bold text-gray-900">
+                          {selectedProduct.minStockLevel || 10} units
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Last Updated</label>
+                        <p className="mt-1 text-gray-900">
+                          {formatTimestamp(selectedProduct.updatedAt || selectedProduct.createdAt)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Modal Footer */}
-            <div className="sticky bottom-0 bg-white p-6 border-t border-gray-200 flex justify-end">
-              <button
-                onClick={closeProductModal}
-                className="px-6 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
-              >
-                Close
-              </button>
+              {/* Modal Footer */}
+              <div className="sticky bottom-0 bg-white p-6 border-t border-gray-200 flex justify-end">
+                <button
+                  onClick={closeProductModal}
+                  className="px-6 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Answer Question Modal */}
+      {/* Answer Question Modal with Blur */}
       {showAnswerModal && selectedQuestion && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Answer Question</h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  Question about: {getProductName(selectedQuestion)}
-                </p>
-              </div>
-              <button
-                onClick={closeAnswerModal}
-                aria-label="Close modal"
-                className="p-2 hover:bg-gray-100 rounded-lg transition"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={closeAnswerModal}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Answer Question</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Question about: {getProductName(selectedQuestion)}
+                  </p>
+                </div>
+                <button
+                  onClick={closeAnswerModal}
+                  aria-label="Close modal"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
+                  <svg
+                    className="w-6 h-6 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
 
-            {/* Modal Content */}
-            <div className="p-6">
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-900 mb-2">Customer Question:</h3>
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                  <p className="text-gray-800">{selectedQuestion.question}</p>
-                  <p className="text-sm text-gray-500 mt-2">Asked by: {selectedQuestion.askedBy}</p>
+              {/* Modal Content */}
+              <div className="p-6">
+                <div className="mb-6">
+                  <h3 className="font-semibold text-gray-900 mb-2">Customer Question:</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p className="text-gray-800">{selectedQuestion.question}</p>
+                    <p className="text-sm text-gray-500 mt-2">Asked by: {selectedQuestion.askedBy}</p>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Your Answer</label>
+                  <textarea
+                    value={answerText}
+                    onChange={(e) => setAnswerText(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                    rows={5}
+                    placeholder="Type your answer here..."
+                  />
                 </div>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Your Answer</label>
-                <textarea
-                  value={answerText}
-                  onChange={(e) => setAnswerText(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                  rows={5}
-                  placeholder="Type your answer here..."
-                />
+              {/* Modal Footer */}
+              <div className="sticky bottom-0 bg-white p-6 border-t border-gray-200 flex justify-end gap-3">
+                <button
+                  onClick={closeAnswerModal}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitAnswer}
+                  className="px-4 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
+                >
+                  Submit Answer
+                </button>
               </div>
             </div>
-
-            {/* Modal Footer */}
-            <div className="sticky bottom-0 bg-white p-6 border-t border-gray-200 flex justify-end gap-3">
-              <button
-                onClick={closeAnswerModal}
-                className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={submitAnswer}
-                className="px-4 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
-              >
-                Submit Answer
-              </button>
-            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Success Modal */}
+      {/* Success Modal with Blur */}
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
-            <div className="p-6 text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                <svg
-                  className="h-6 w-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => setShowSuccessModal(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+              <div className="p-6 text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                  <svg
+                    className="h-6 w-6 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Success!</h3>
+                <p className="text-gray-600 mb-6">Your answer has been submitted successfully.</p>
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="w-full px-4 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+                  OK
+                </button>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Success!</h3>
-              <p className="text-gray-600 mb-6">Your answer has been submitted successfully.</p>
-              <button
-                onClick={() => setShowSuccessModal(false)}
-                className="w-full px-4 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
-              >
-                OK
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Error Modal */}
+      {/* Error Modal with Blur */}
       {showErrorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
-            <div className="p-6 text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                <svg
-                  className="h-6 w-6 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => setShowErrorModal(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+              <div className="p-6 text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                  <svg
+                    className="h-6 w-6 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Error</h3>
+                <p className="text-gray-600 mb-6">{errorMessage}</p>
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="w-full px-4 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                  OK
+                </button>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Error</h3>
-              <p className="text-gray-600 mb-6">{errorMessage}</p>
-              <button
-                onClick={() => setShowErrorModal(false)}
-                className="w-full px-4 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
-              >
-                OK
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

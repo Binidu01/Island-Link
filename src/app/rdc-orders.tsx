@@ -464,7 +464,7 @@ export default function RDCOrders() {
           <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #f97316; white-space: nowrap; vertical-align: top;">
             LKR ${itemTotal.toLocaleString()}
           </td>
-        </tr>
+         </>
       `
         })
         .join('')
@@ -1167,374 +1167,398 @@ Need help? Contact us at support@islandlink.com or call +94 77 123 4567
         </div>
       </div>
 
-      {/* Order Details Modal */}
+      {/* Order Details Modal with Blur */}
       {showOrderModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
-                <p className="text-sm text-gray-900">{getOrderNumber(selectedOrder)}</p>
-              </div>
-              <button
-                onClick={() => setShowOrderModal(false)}
-                aria-label="Close order details"
-                className="text-gray-400 hover:text-gray-600 text-2xl"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Order Info */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => setShowOrderModal(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Status</p>
+                  <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
+                  <p className="text-sm text-gray-900">{getOrderNumber(selectedOrder)}</p>
+                </div>
+                <button
+                  onClick={() => setShowOrderModal(false)}
+                  aria-label="Close order details"
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="p-6 space-y-6">
+                {/* Order Info */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Status</p>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedOrder.status)}`}
+                    >
+                      {selectedOrder.status?.toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Date</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {formatTimestamp(selectedOrder.createdAt)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Payment</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {selectedOrder.paymentMethod?.toUpperCase()}
+                      </p>
+                      <p className="text-xs font-medium text-gray-700">
+                        {getPaymentStatus(selectedOrder)}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Items</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {getTotalItems(selectedOrder)} items
+                    </p>
+                  </div>
+                </div>
+
+                {/* Status History */}
+                {selectedOrder.statusUpdates && selectedOrder.statusUpdates.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-3">Status History</h3>
+                    <div className="space-y-3">
+                      {selectedOrder.statusUpdates
+                        .slice()
+                        .reverse()
+                        .map((update, idx) => (
+                          <div key={idx} className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
+                            <div
+                              className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(update.status)}`}
+                            >
+                              {update.status.toUpperCase()}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-900">
+                                Updated by <span className="font-medium">{update.updatedBy}</span> (
+                                {update.updatedByRole})
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                {update.updatedByRDC} • {formatTimestamp(update.timestamp)}
+                              </p>
+                              {update.note && (
+                                <p className="text-xs text-gray-700 mt-1 bg-gray-100 p-2 rounded">
+                                  Note: {update.note}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Order Items */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-3">Order Items</h3>
+                  <div className="space-y-3">
+                    {selectedOrder.items.map((item, idx) => {
+                      const productName = item.productName || item.name || 'Product'
+                      const productSKU = item.sku || item.productId || 'N/A'
+
+                      return (
+                        <div key={idx} className="flex gap-4 items-center bg-gray-50 p-3 rounded-lg">
+                          <img
+                            src={item.imageURL || 'https://via.placeholder.com/80'}
+                            alt={productName}
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">{productName}</p>
+                            <p className="text-sm text-gray-600">SKU: {productSKU}</p>
+                            <p className="text-sm text-gray-600">
+                              Qty: {item.quantity} × {formatCurrency(item.price)}
+                            </p>
+                          </div>
+                          <p className="font-semibold text-gray-900">
+                            {formatCurrency(item.price * item.quantity)}
+                          </p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Summary */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(selectedOrder.subtotal || 0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-gray-600">Shipping</span>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(selectedOrder.shipping || 0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-gray-300">
+                    <span className="font-bold text-gray-900">Total</span>
+                    <span className="font-bold text-blue-600 text-lg">
+                      {formatCurrency(getOrderTotal(selectedOrder))}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Customer & Shipping */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-3">Customer Information</h3>
+                    <div className="space-y-2 text-sm">
+                      <p className="text-gray-900">
+                        <span className="text-gray-600">Name:</span> {getCustomerName(selectedOrder)}
+                      </p>
+                      <p className="text-gray-900">
+                        <span className="text-gray-600">Email:</span> {selectedOrder.userEmail}
+                      </p>
+                      <p className="text-gray-900">
+                        <span className="text-gray-600">Phone:</span>{' '}
+                        {selectedOrder.shippingInfo?.phone || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-3">Shipping Information</h3>
+                    <div className="space-y-2 text-sm">
+                      <p className="text-gray-900">
+                        <span className="text-gray-600">Address:</span>{' '}
+                        {selectedOrder.shippingInfo?.address}
+                      </p>
+                      <p className="text-gray-900">
+                        <span className="text-gray-600">City:</span>{' '}
+                        {selectedOrder.shippingInfo?.city}
+                      </p>
+                      <p className="text-gray-900">
+                        <span className="text-gray-600">Postal:</span>{' '}
+                        {selectedOrder.shippingInfo?.postalCode}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                {canRDCStaffUpdate(selectedOrder) && (
+                  <button
+                    onClick={() => {
+                      setShowOrderModal(false)
+                      setShowStatusModal(true)
+                    }}
+                    className="w-full px-4 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition font-semibold"
+                  >
+                    Update Order Status
+                  </button>
+                )}
+                {(selectedOrder.status?.toLowerCase() === 'processing' ||
+                  selectedOrder.status?.toLowerCase() === 'delivered' ||
+                  selectedOrder.status?.toLowerCase() === 'rejected') && (
+                  <div
+                    className={`${
+                      selectedOrder.status?.toLowerCase() === 'processing'
+                        ? 'bg-blue-50 border-blue-200'
+                        : selectedOrder.status?.toLowerCase() === 'delivered'
+                          ? 'bg-green-50 border-green-200'
+                          : 'bg-red-50 border-red-200'
+                    } border rounded-xl p-4 text-center`}
+                  >
+                    <p
+                      className={`${
+                        selectedOrder.status?.toLowerCase() === 'processing'
+                          ? 'text-blue-700'
+                          : selectedOrder.status?.toLowerCase() === 'delivered'
+                            ? 'text-green-700'
+                            : 'text-red-700'
+                      } font-medium`}
+                    >
+                      {selectedOrder.status?.toLowerCase() === 'processing'
+                        ? '📦 Order is processing at RDC'
+                        : selectedOrder.status?.toLowerCase() === 'delivered'
+                          ? '✅ Order delivered by Logistics team'
+                          : '⚠️ Order rejected by Logistics team'}
+                    </p>
+                    <p
+                      className={`${
+                        selectedOrder.status?.toLowerCase() === 'processing'
+                          ? 'text-blue-600'
+                          : selectedOrder.status?.toLowerCase() === 'delivered'
+                            ? 'text-green-600'
+                            : 'text-red-600'
+                      } text-sm mt-1`}
+                    >
+                      {selectedOrder.status?.toLowerCase() === 'processing'
+                        ? 'Ready for Logistics team pickup'
+                        : selectedOrder.status?.toLowerCase() === 'delivered'
+                          ? 'Delivery completed by Logistics team'
+                          : 'Rejection handled by Logistics team'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Status Update Modal with Blur */}
+      {showStatusModal && selectedOrder && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => !updatingStatus && setShowStatusModal(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+              <div className="p-6 border-b flex justify-between items-center">
+                <h2 className="text-xl font-bold text-gray-900">Update Order Status</h2>
+                <button
+                  onClick={() => setShowStatusModal(false)}
+                  disabled={updatingStatus}
+                  aria-label="Close status update"
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Order Number</p>
+                  <p className="font-semibold text-gray-900">{getOrderNumber(selectedOrder)}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Current Status</p>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedOrder.status)}`}
                   >
                     {selectedOrder.status?.toUpperCase()}
                   </span>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Date</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    {formatTimestamp(selectedOrder.createdAt)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Payment</p>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {selectedOrder.paymentMethod?.toUpperCase()}
-                    </p>
-                    <p className="text-xs font-medium text-gray-700">
-                      {getPaymentStatus(selectedOrder)}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Items</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    {getTotalItems(selectedOrder)} items
-                  </p>
-                </div>
-              </div>
 
-              {/* Status History */}
-              {selectedOrder.statusUpdates && selectedOrder.statusUpdates.length > 0 && (
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Status History</h3>
+                  <p className="text-sm text-gray-500 mb-2">Select New Status</p>
                   <div className="space-y-3">
-                    {selectedOrder.statusUpdates
-                      .slice()
-                      .reverse()
-                      .map((update, idx) => (
-                        <div key={idx} className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg">
-                          <div
-                            className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(update.status)}`}
-                          >
-                            {update.status.toUpperCase()}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-900">
-                              Updated by <span className="font-medium">{update.updatedBy}</span> (
-                              {update.updatedByRole})
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              {update.updatedByRDC} • {formatTimestamp(update.timestamp)}
-                            </p>
-                            {update.note && (
-                              <p className="text-xs text-gray-700 mt-1 bg-gray-100 p-2 rounded">
-                                Note: {update.note}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Order Items */}
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-3">Order Items</h3>
-                <div className="space-y-3">
-                  {selectedOrder.items.map((item, idx) => {
-                    const productName = item.productName || item.name || 'Product'
-                    const productSKU = item.sku || item.productId || 'N/A'
-
-                    return (
-                      <div key={idx} className="flex gap-4 items-center bg-gray-50 p-3 rounded-lg">
-                        <img
-                          src={item.imageURL || 'https://via.placeholder.com/80'}
-                          alt={productName}
-                          className="w-16 h-16 object-cover rounded"
-                        />
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900">{productName}</p>
-                          <p className="text-sm text-gray-600">SKU: {productSKU}</p>
-                          <p className="text-sm text-gray-600">
-                            Qty: {item.quantity} × {formatCurrency(item.price)}
-                          </p>
-                        </div>
-                        <p className="font-semibold text-gray-900">
-                          {formatCurrency(item.price * item.quantity)}
+                    {getStatusOptions(selectedOrder.status || 'pending').map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => handleStatusConfirm(option.value)}
+                        disabled={updatingStatus}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 hover:bg-gray-50 transition font-medium disabled:opacity-50 flex items-center justify-between"
+                      >
+                        <span>{option.label}</span>
+                        <span className="text-xs text-gray-500">→ {option.value.toUpperCase()}</span>
+                      </button>
+                    ))}
+                    {getStatusOptions(selectedOrder.status || 'pending').length === 0 && (
+                      <div className="text-center py-4">
+                        <p className="text-gray-700">No further actions available for this status.</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          RDC staff can only update orders up to "Processing" status.
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Delivery and rejection handled by Logistics team.
                         </p>
                       </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Summary */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex justify-between mb-2">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium text-gray-900">
-                    {formatCurrency(selectedOrder.subtotal || 0)}
-                  </span>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium text-gray-900">
-                    {formatCurrency(selectedOrder.shipping || 0)}
-                  </span>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-gray-300">
-                  <span className="font-bold text-gray-900">Total</span>
-                  <span className="font-bold text-blue-600 text-lg">
-                    {formatCurrency(getOrderTotal(selectedOrder))}
-                  </span>
-                </div>
-              </div>
-
-              {/* Customer & Shipping */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Customer Information</h3>
-                  <div className="space-y-2 text-sm">
-                    <p className="text-gray-900">
-                      <span className="text-gray-600">Name:</span> {getCustomerName(selectedOrder)}
-                    </p>
-                    <p className="text-gray-900">
-                      <span className="text-gray-600">Email:</span> {selectedOrder.userEmail}
-                    </p>
-                    <p className="text-gray-900">
-                      <span className="text-gray-600">Phone:</span>{' '}
-                      {selectedOrder.shippingInfo?.phone || 'N/A'}
-                    </p>
+                    )}
                   </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3">Shipping Information</h3>
-                  <div className="space-y-2 text-sm">
-                    <p className="text-gray-900">
-                      <span className="text-gray-600">Address:</span>{' '}
-                      {selectedOrder.shippingInfo?.address}
-                    </p>
-                    <p className="text-gray-900">
-                      <span className="text-gray-600">City:</span>{' '}
-                      {selectedOrder.shippingInfo?.city}
-                    </p>
-                    <p className="text-gray-900">
-                      <span className="text-gray-600">Postal:</span>{' '}
-                      {selectedOrder.shippingInfo?.postalCode}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              {canRDCStaffUpdate(selectedOrder) && (
-                <button
-                  onClick={() => {
-                    setShowOrderModal(false)
-                    setShowStatusModal(true)
-                  }}
-                  className="w-full px-4 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition font-semibold"
-                >
-                  Update Order Status
-                </button>
-              )}
-              {(selectedOrder.status?.toLowerCase() === 'processing' ||
-                selectedOrder.status?.toLowerCase() === 'delivered' ||
-                selectedOrder.status?.toLowerCase() === 'rejected') && (
-                <div
-                  className={`${
-                    selectedOrder.status?.toLowerCase() === 'processing'
-                      ? 'bg-blue-50 border-blue-200'
-                      : selectedOrder.status?.toLowerCase() === 'delivered'
-                        ? 'bg-green-50 border-green-200'
-                        : 'bg-red-50 border-red-200'
-                  } border rounded-xl p-4 text-center`}
-                >
-                  <p
-                    className={`${
-                      selectedOrder.status?.toLowerCase() === 'processing'
-                        ? 'text-blue-700'
-                        : selectedOrder.status?.toLowerCase() === 'delivered'
-                          ? 'text-green-700'
-                          : 'text-red-700'
-                    } font-medium`}
-                  >
-                    {selectedOrder.status?.toLowerCase() === 'processing'
-                      ? '📦 Order is processing at RDC'
-                      : selectedOrder.status?.toLowerCase() === 'delivered'
-                        ? '✅ Order delivered by Logistics team'
-                        : '⚠️ Order rejected by Logistics team'}
-                  </p>
-                  <p
-                    className={`${
-                      selectedOrder.status?.toLowerCase() === 'processing'
-                        ? 'text-blue-600'
-                        : selectedOrder.status?.toLowerCase() === 'delivered'
-                          ? 'text-green-600'
-                          : 'text-red-600'
-                    } text-sm mt-1`}
-                  >
-                    {selectedOrder.status?.toLowerCase() === 'processing'
-                      ? 'Ready for Logistics team pickup'
-                      : selectedOrder.status?.toLowerCase() === 'delivered'
-                        ? 'Delivery completed by Logistics team'
-                        : 'Rejection handled by Logistics team'}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Status Update Modal */}
-      {showStatusModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900">Update Order Status</h2>
-              <button
-                onClick={() => setShowStatusModal(false)}
-                disabled={updatingStatus}
-                aria-label="Close status update"
-                className="text-gray-400 hover:text-gray-600 text-2xl"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Order Number</p>
-                <p className="font-semibold text-gray-900">{getOrderNumber(selectedOrder)}</p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Current Status</p>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedOrder.status)}`}
-                >
-                  {selectedOrder.status?.toUpperCase()}
-                </span>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500 mb-2">Select New Status</p>
-                <div className="space-y-3">
-                  {getStatusOptions(selectedOrder.status || 'pending').map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => handleStatusConfirm(option.value)}
-                      disabled={updatingStatus}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-gray-900 hover:bg-gray-50 transition font-medium disabled:opacity-50 flex items-center justify-between"
-                    >
-                      <span>{option.label}</span>
-                      <span className="text-xs text-gray-500">→ {option.value.toUpperCase()}</span>
-                    </button>
-                  ))}
-                  {getStatusOptions(selectedOrder.status || 'pending').length === 0 && (
-                    <div className="text-center py-4">
-                      <p className="text-gray-700">No further actions available for this status.</p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        RDC staff can only update orders up to "Processing" status.
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Delivery and rejection handled by Logistics team.
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Success Modal */}
+      {/* Success Modal with Blur */}
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <div className="text-center">
-              <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => setShowSuccessModal(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+              <div className="text-center">
+                <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Success</h2>
+                <p className="text-gray-900 mb-4">{modalMessage}</p>
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="px-6 py-2.5 bg-linear-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+                  OK
+                </button>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Success</h2>
-              <p className="text-gray-900 mb-4">{modalMessage}</p>
-              <button
-                onClick={() => setShowSuccessModal(false)}
-                className="px-6 py-2.5 bg-linear-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition"
-              >
-                OK
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Error Modal */}
+      {/* Error Modal with Blur */}
       {showErrorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <div className="text-center">
-              <div className="mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => setShowErrorModal(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+              <div className="text-center">
+                <div className="mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Error</h2>
+                <p className="text-gray-900 mb-4">{modalMessage}</p>
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-6 py-2.5 bg-linear-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                  OK
+                </button>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Error</h2>
-              <p className="text-gray-900 mb-4">{modalMessage}</p>
-              <button
-                onClick={() => setShowErrorModal(false)}
-                className="px-6 py-2.5 bg-linear-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition"
-              >
-                OK
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

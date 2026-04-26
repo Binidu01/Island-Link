@@ -100,6 +100,7 @@ interface ProductPerformance {
   revenue: number
   currentStock: number
   rdcLocation: string
+  imageURL?: string  // Added imageURL field
 }
 
 export default function RDCTracking() {
@@ -648,6 +649,7 @@ export default function RDCTracking() {
               revenue,
               currentStock: product.stock,
               rdcLocation: product.rdcLocation,
+              imageURL: product.imageURL,  // Added image URL
             }
           })
           .sort((a, b) => b.revenue - a.revenue)
@@ -686,6 +688,7 @@ export default function RDCTracking() {
               revenue,
               currentStock: product.stock,
               rdcLocation: product.rdcLocation,
+              imageURL: product.imageURL,  // Added image URL
             }
           })
           .sort((a, b) => b.revenue - a.revenue)
@@ -1290,451 +1293,472 @@ export default function RDCTracking() {
         )}
       </div>
 
-      {/* RDC Detail Modal */}
+      {/* RDC Detail Modal with Blur */}
       {showRDCModal && selectedRDCData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedRDCData.rdcName}</h2>
-                  <p className="text-gray-600">Detailed Performance Analysis</p>
-                </div>
-                <button
-                  onClick={() => setShowRDCModal(false)}
-                  aria-label="Close modal"
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Performance Metrics Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4">
-                  <p className="text-sm text-blue-700 font-medium">Performance Score</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <p
-                      className={`text-3xl font-bold ${getPerformanceColor(selectedRDCData.performanceScore).split(' ')[0]}`}
-                    >
-                      {selectedRDCData.performanceScore}
-                    </p>
-                    <span className="text-sm text-blue-600">/100</span>
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => setShowRDCModal(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">{selectedRDCData.rdcName}</h2>
+                    <p className="text-gray-600">Detailed Performance Analysis</p>
                   </div>
-                </div>
-
-                <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4">
-                  <p className="text-sm text-green-700 font-medium">Monthly Growth</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <p
-                      className={`text-3xl font-bold ${getGrowthColor(selectedRDCData.monthlyGrowth).split(' ')[0]}`}
-                    >
-                      {selectedRDCData.monthlyGrowth > 0 ? '+' : ''}
-                      {selectedRDCData.monthlyGrowth.toFixed(1)}%
-                    </p>
-                    <svg
-                      className="w-6 h-6 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                  <button
+                    onClick={() => setShowRDCModal(false)}
+                    aria-label="Close modal"
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                        d="M6 18L18 6M6 6l12 12"
                       />
                     </svg>
-                  </div>
+                  </button>
                 </div>
 
-                <div className="bg-linear-to-br from-purple-50 to-purple-100 rounded-xl p-4">
-                  <p className="text-sm text-purple-700 font-medium">Inventory Value</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-3xl font-bold text-purple-700">
-                      {formatCurrency(selectedRDCData.totalValue)}
-                    </p>
-                    <svg
-                      className="w-6 h-6 text-purple-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-
-                <div className="bg-linear-to-br from-orange-50 to-orange-100 rounded-xl p-4">
-                  <p className="text-sm text-orange-700 font-medium">Order Fulfillment Rate</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-3xl font-bold text-orange-700">
-                      {selectedRDCData.totalOrders > 0
-                        ? Math.round(
-                            (selectedRDCData.deliveredOrders / selectedRDCData.totalOrders) * 100
-                          )
-                        : 0}
-                      %
-                    </p>
-                    <svg
-                      className="w-6 h-6 text-orange-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stock Health Section */}
-              <div className="mb-8">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Stock Health</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <svg
-                          className="w-5 h-5 text-green-600"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">In Stock Products</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {selectedRDCData.totalProducts - selectedRDCData.outOfStockProducts}
-                        </p>
-                      </div>
+                {/* Performance Metrics Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                  <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4">
+                    <p className="text-sm text-blue-700 font-medium">Performance Score</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p
+                        className={`text-3xl font-bold ${getPerformanceColor(selectedRDCData.performanceScore).split(' ')[0]}`}
+                      >
+                        {selectedRDCData.performanceScore}
+                      </p>
+                      <span className="text-sm text-blue-600">/100</span>
                     </div>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                        <svg
-                          className="w-5 h-5 text-yellow-600"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.998-.833-2.73 0L4.346 16.5c-.77.833.192 2.5 1.732 2.5z"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Low Stock Items</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {selectedRDCData.lowStockProducts}
-                        </p>
-                      </div>
+                  <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4">
+                    <p className="text-sm text-green-700 font-medium">Monthly Growth</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p
+                        className={`text-3xl font-bold ${getGrowthColor(selectedRDCData.monthlyGrowth).split(' ')[0]}`}
+                      >
+                        {selectedRDCData.monthlyGrowth > 0 ? '+' : ''}
+                        {selectedRDCData.monthlyGrowth.toFixed(1)}%
+                      </p>
+                      <svg
+                        className="w-6 h-6 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                        />
+                      </svg>
                     </div>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                        <svg
-                          className="w-5 h-5 text-red-600"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Out of Stock</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {selectedRDCData.outOfStockProducts}
-                        </p>
-                      </div>
+                  <div className="bg-linear-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+                    <p className="text-sm text-purple-700 font-medium">Inventory Value</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-3xl font-bold text-purple-700">
+                        {formatCurrency(selectedRDCData.totalValue)}
+                      </p>
+                      <svg
+                        className="w-6 h-6 text-purple-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div className="bg-linear-to-br from-orange-50 to-orange-100 rounded-xl p-4">
+                    <p className="text-sm text-orange-700 font-medium">Order Fulfillment Rate</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-3xl font-bold text-orange-700">
+                        {selectedRDCData.totalOrders > 0
+                          ? Math.round(
+                              (selectedRDCData.deliveredOrders / selectedRDCData.totalOrders) * 100
+                            )
+                          : 0}
+                        %
+                      </p>
+                      <svg
+                        className="w-6 h-6 text-orange-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Orders Overview */}
-              <div className="mb-8">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Orders Overview</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <h4 className="font-medium text-gray-700 mb-3">Order Status Distribution</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          <span className="text-sm text-gray-600">Delivered/Confirmed</span>
+                {/* Stock Health Section */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Stock Health</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-white border border-gray-200 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-green-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
                         </div>
-                        <span className="font-medium text-gray-900">
-                          {selectedRDCData.deliveredOrders}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                          <span className="text-sm text-gray-600">Pending</span>
+                        <div>
+                          <p className="text-sm text-gray-600">In Stock Products</p>
+                          <p className="text-2xl font-bold text-gray-900">
+                            {selectedRDCData.totalProducts - selectedRDCData.outOfStockProducts}
+                          </p>
                         </div>
-                        <span className="font-medium text-gray-900">
-                          {selectedRDCData.pendingOrders}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
-                          <span className="text-sm text-gray-600">Other</span>
-                        </div>
-                        <span className="font-medium text-gray-900">
-                          {selectedRDCData.totalOrders -
-                            selectedRDCData.deliveredOrders -
-                            selectedRDCData.pendingOrders}
-                        </span>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-4">
-                    <h4 className="font-medium text-gray-700 mb-3">Revenue Metrics</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Total Revenue</span>
-                        <span className="font-bold text-gray-900">
-                          {formatCurrency(selectedRDCData.totalRevenue)}
-                        </span>
+                    <div className="bg-white border border-gray-200 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-yellow-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.998-.833-2.73 0L4.346 16.5c-.77.833.192 2.5 1.732 2.5z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Low Stock Items</p>
+                          <p className="text-2xl font-bold text-gray-900">
+                            {selectedRDCData.lowStockProducts}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Average Order Value</span>
-                        <span className="font-bold text-gray-900">
-                          {formatCurrency(selectedRDCData.avgOrderValue)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Total Orders</span>
-                        <span className="font-bold text-gray-900">
-                          {selectedRDCData.totalOrders}
-                        </span>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Out of Stock</p>
+                          <p className="text-2xl font-bold text-gray-900">
+                            {selectedRDCData.outOfStockProducts}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleViewProducts(selectedRDCData)}
-                  className="flex-1 bg-blue-600 text-white py-2.5 px-4 rounded-lg hover:bg-blue-700 transition font-medium"
-                >
-                  View Product Performance
-                </button>
-                <button
-                  onClick={() => setShowRDCModal(false)}
-                  className="flex-1 border border-gray-300 text-gray-700 py-2.5 px-4 rounded-lg hover:bg-gray-50 transition font-medium"
-                >
-                  Close
-                </button>
+                {/* Orders Overview */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Orders Overview</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white border border-gray-200 rounded-xl p-4">
+                      <h4 className="font-medium text-gray-700 mb-3">Order Status Distribution</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span className="text-sm text-gray-600">Delivered/Confirmed</span>
+                          </div>
+                          <span className="font-medium text-gray-900">
+                            {selectedRDCData.deliveredOrders}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <span className="text-sm text-gray-600">Pending</span>
+                          </div>
+                          <span className="font-medium text-gray-900">
+                            {selectedRDCData.pendingOrders}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+                            <span className="text-sm text-gray-600">Other</span>
+                          </div>
+                          <span className="font-medium text-gray-900">
+                            {selectedRDCData.totalOrders -
+                              selectedRDCData.deliveredOrders -
+                              selectedRDCData.pendingOrders}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 rounded-xl p-4">
+                      <h4 className="font-medium text-gray-700 mb-3">Revenue Metrics</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Total Revenue</span>
+                          <span className="font-bold text-gray-900">
+                            {formatCurrency(selectedRDCData.totalRevenue)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Average Order Value</span>
+                          <span className="font-bold text-gray-900">
+                            {formatCurrency(selectedRDCData.avgOrderValue)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Total Orders</span>
+                          <span className="font-bold text-gray-900">
+                            {selectedRDCData.totalOrders}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleViewProducts(selectedRDCData)}
+                    className="flex-1 bg-blue-600 text-white py-2.5 px-4 rounded-lg hover:bg-blue-700 transition font-medium"
+                  >
+                    View Product Performance
+                  </button>
+                  <button
+                    onClick={() => setShowRDCModal(false)}
+                    className="flex-1 border border-gray-300 text-gray-700 py-2.5 px-4 rounded-lg hover:bg-gray-50 transition font-medium"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Product Performance Modal */}
+      {/* Product Performance Modal with Blur */}
       {showProductModal && selectedRDCData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Product Performance - {selectedRDCData.rdcName}
-                  </h2>
-                  <p className="text-gray-600">{rdcProducts.length} products • Sorted by revenue</p>
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => setShowProductModal(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Product Performance - {selectedRDCData.rdcName}
+                    </h2>
+                    <p className="text-gray-600">{rdcProducts.length} products • Sorted by revenue</p>
+                  </div>
+                  <button
+                    onClick={() => setShowProductModal(false)}
+                    aria-label="Close modal"
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
                 </div>
-                <button
-                  onClick={() => setShowProductModal(false)}
-                  aria-label="Close modal"
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
 
-              {/* Product Performance Table */}
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Product
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        SKU
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Category
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Units Sold
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Revenue
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Current Stock
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Stock Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {rdcProducts.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="px-4 py-12 text-center text-gray-500">
-                          No product data available for this RDC
-                        </td>
+                {/* Product Performance Table */}
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Product
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          SKU
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Category
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Units Sold
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Revenue
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Current Stock
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Stock Status
+                        </th>
                       </tr>
-                    ) : (
-                      rdcProducts.map((product) => (
-                        <tr key={product.productId} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-gray-200 rounded-md"></div>
-                              <div>
-                                <p className="font-medium text-gray-900 text-sm">{product.name}</p>
-                                <p className="text-xs text-gray-500">{product.rdcLocation}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                            {product.sku}
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                              {product.category}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
-                            {product.totalSold}
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
-                            {formatCurrency(product.revenue)}
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                            {product.currentStock}
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStockStatusColor(product.currentStock)}`}
-                            >
-                              {product.currentStock === 0
-                                ? 'Out of Stock'
-                                : product.currentStock < 5
-                                  ? 'Very Low'
-                                  : product.currentStock < 10
-                                    ? 'Low'
-                                    : product.currentStock < 20
-                                      ? 'Warning'
-                                      : 'Healthy'}
-                            </span>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {rdcProducts.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="px-4 py-12 text-center text-gray-500">
+                            No product data available for this RDC
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                      ) : (
+                        rdcProducts.map((product) => (
+                          <tr key={product.productId} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                                  <img
+                                    src={product.imageURL || 'https://via.placeholder.com/40'}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.currentTarget.src = 'https://via.placeholder.com/40?text=No+Image'
+                                    }}
+                                  />
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900 text-sm">{product.name}</p>
+                                  <p className="text-xs text-gray-500">{product.rdcLocation}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                              {product.sku}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                {product.category}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
+                              {product.totalSold}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900">
+                              {formatCurrency(product.revenue)}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                              {product.currentStock}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <span
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStockStatusColor(product.currentStock)}`}
+                              >
+                                {product.currentStock === 0
+                                  ? 'Out of Stock'
+                                  : product.currentStock < 5
+                                    ? 'Very Low'
+                                    : product.currentStock < 10
+                                      ? 'Low'
+                                      : product.currentStock < 20
+                                        ? 'Warning'
+                                        : 'Healthy'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
 
-              {/* Performance Summary */}
-              {rdcProducts.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Performance Summary</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4">
-                      <p className="text-sm text-blue-700 font-medium">Top Product</p>
-                      <p className="text-lg font-bold text-gray-900 mt-1">
-                        {rdcProducts[0]?.name || 'N/A'}
-                      </p>
-                      <p className="text-sm text-blue-600">
-                        Revenue: {formatCurrency(rdcProducts[0]?.revenue || 0)}
-                      </p>
-                    </div>
+                {/* Performance Summary */}
+                {rdcProducts.length > 0 && (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">Performance Summary</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4">
+                        <p className="text-sm text-blue-700 font-medium">Top Product</p>
+                        <p className="text-lg font-bold text-gray-900 mt-1">
+                          {rdcProducts[0]?.name || 'N/A'}
+                        </p>
+                        <p className="text-sm text-blue-600">
+                          Revenue: {formatCurrency(rdcProducts[0]?.revenue || 0)}
+                        </p>
+                      </div>
 
-                    <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4">
-                      <p className="text-sm text-green-700 font-medium">
-                        Total Revenue from Products
-                      </p>
-                      <p className="text-lg font-bold text-gray-900 mt-1">
-                        {formatCurrency(rdcProducts.reduce((sum, p) => sum + p.revenue, 0))}
-                      </p>
-                      <p className="text-sm text-green-600">{rdcProducts.length} products</p>
-                    </div>
+                      <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4">
+                        <p className="text-sm text-green-700 font-medium">
+                          Total Revenue from Products
+                        </p>
+                        <p className="text-lg font-bold text-gray-900 mt-1">
+                          {formatCurrency(rdcProducts.reduce((sum, p) => sum + p.revenue, 0))}
+                        </p>
+                        <p className="text-sm text-green-600">{rdcProducts.length} products</p>
+                      </div>
 
-                    <div className="bg-linear-to-br from-red-50 to-red-100 rounded-xl p-4">
-                      <p className="text-sm text-red-700 font-medium">Critical Stock Items</p>
-                      <p className="text-lg font-bold text-gray-900 mt-1">
-                        {rdcProducts.filter((p) => p.currentStock < 5).length}
-                      </p>
-                      <p className="text-sm text-red-600">Need immediate attention</p>
+                      <div className="bg-linear-to-br from-red-50 to-red-100 rounded-xl p-4">
+                        <p className="text-sm text-red-700 font-medium">Critical Stock Items</p>
+                        <p className="text-lg font-bold text-gray-900 mt-1">
+                          {rdcProducts.filter((p) => p.currentStock < 5).length}
+                        </p>
+                        <p className="text-sm text-red-600">Need immediate attention</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={() => setShowProductModal(false)}
-                  className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
-                >
-                  Close
-                </button>
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={() => setShowProductModal(false)}
+                    className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

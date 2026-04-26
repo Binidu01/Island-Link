@@ -1183,14 +1183,14 @@ export default function ManageProducts() {
                             </div>
                           </div>
                         </div>
-                      </td>
+                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(product.category)}`}
                         >
                           {product.category || 'Uncategorized'}
                         </span>
-                      </td>
+                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm font-semibold text-gray-900">
                           {formatCurrency(product.price)}
@@ -1206,13 +1206,13 @@ export default function ManageProducts() {
                         <div className="text-xs text-gray-500 mt-1">
                           Value: {formatCurrency(product.price * product.stock)}
                         </div>
-                      </td>
+                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{product.rdcLocation || 'N/A'}</div>
                         <div className="text-xs text-gray-500">
                           {formatTimestamp(product.createdAt)}
                         </div>
-                      </td>
+                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center gap-3">
                           <button
@@ -1279,20 +1279,20 @@ export default function ManageProducts() {
                             </>
                           )}
                         </div>
-                      </td>
-                    </tr>
+                       </td>
+                     </tr>
                   ))}
                 </tbody>
-              </table>
+               </table>
             </div>
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
+        {/* Delete Confirmation Modal with Blur */}
         {showDeleteModal && productToDelete && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => !deleting && setShowDeleteModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1380,11 +1380,11 @@ export default function ManageProducts() {
           </>
         )}
 
-        {/* Edit Product Modal */}
+        {/* Edit Product Modal with Blur */}
         {showEditModal && productToEdit && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowEditModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1681,11 +1681,11 @@ export default function ManageProducts() {
           </>
         )}
 
-        {/* Add Product Modal */}
+        {/* Add Product Modal with Blur */}
         {showAddModal && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowAddModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1982,11 +1982,11 @@ export default function ManageProducts() {
           </>
         )}
 
-        {/* Success Modal */}
+        {/* Success Modal with Blur */}
         {showSuccessModal && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowSuccessModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -2043,11 +2043,11 @@ export default function ManageProducts() {
           </>
         )}
 
-        {/* Error Modal */}
+        {/* Error Modal with Blur */}
         {showErrorModal && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowErrorModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

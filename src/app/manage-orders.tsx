@@ -444,14 +444,14 @@ export default function ManageOrdersAdmin() {
           <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
             <div style="font-weight: 600; color: #1f2937; font-size: 14px; margin-bottom: 4px;">${itemName}</div>
             <div style="color: #6b7280; font-size: 12px;">SKU: ${skuValue}</div>
-          </td>
+           </td>
           <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; color: #6b7280; vertical-align: top;">
             ${item.quantity}
-          </td>
+           </td>
           <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #f97316; white-space: nowrap; vertical-align: top;">
             LKR ${((item.price || 0) * (item.quantity || 1)).toLocaleString()}
-          </td>
-        </tr>
+           </td>
+         </>
       `
         })
         .join('')
@@ -1331,11 +1331,11 @@ Need help? Contact us at support@islandlink.com or call +94 77 123 4567
         </div>
       </div>
 
-      {/* Status Update Modal */}
+      {/* Status Update Modal with Blur */}
       {statusUpdateModal.isOpen && statusUpdateModal.order && (
         <>
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-50"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
             onClick={() => !updating && setStatusUpdateModal({ isOpen: false, order: null })}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1574,11 +1574,11 @@ Need help? Contact us at support@islandlink.com or call +94 77 123 4567
         </>
       )}
 
-      {/* Success Modal */}
+      {/* Success Modal with Blur */}
       {showSuccessModal && (
         <>
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-50"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
             onClick={() => setShowSuccessModal(false)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1613,11 +1613,11 @@ Need help? Contact us at support@islandlink.com or call +94 77 123 4567
         </>
       )}
 
-      {/* Error Modal */}
+      {/* Error Modal with Blur */}
       {showErrorModal && (
         <>
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-50"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
             onClick={() => setShowErrorModal(false)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

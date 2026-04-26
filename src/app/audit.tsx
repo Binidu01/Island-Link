@@ -859,7 +859,7 @@ export default function AuditLogs() {
                             </span>
                           )}
                         </div>
-                      </td>
+                       </td>
                       <td className="px-6 py-4">
                         <div className="max-w-xs">
                           <div className="text-sm font-medium text-gray-900 truncate">
@@ -871,7 +871,7 @@ export default function AuditLogs() {
                             </div>
                           )}
                         </div>
-                      </td>
+                       </td>
                       <td className="px-6 py-4">
                         <div>
                           <div className="text-sm font-medium text-gray-900">
@@ -881,7 +881,7 @@ export default function AuditLogs() {
                             {log.performedBy}
                           </div>
                         </div>
-                      </td>
+                       </td>
                       <td className="px-6 py-4">
                         <div>
                           <div className="text-sm text-gray-900">
@@ -891,7 +891,7 @@ export default function AuditLogs() {
                             {formatTimestamp(log.timestamp)}
                           </div>
                         </div>
-                      </td>
+                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={() => handleViewLog(log)}
@@ -918,8 +918,8 @@ export default function AuditLogs() {
                           </svg>
                           View Details
                         </button>
-                      </td>
-                    </tr>
+                       </td>
+                     </tr>
                   ))}
                 </tbody>
               </table>
@@ -927,30 +927,11 @@ export default function AuditLogs() {
           )}
         </div>
 
-        {/* Pagination (Optional - for large datasets) */}
-        {filteredLogs.length > 0 && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-700">
-              Showing <span className="font-medium">1</span> to{' '}
-              <span className="font-medium">{Math.min(50, filteredLogs.length)}</span> of{' '}
-              <span className="font-medium">{filteredLogs.length}</span> logs
-            </div>
-            <div className="flex gap-2">
-              <button className="px-3 py-1 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                Previous
-              </button>
-              <button className="px-3 py-1 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Log Details Modal */}
+        {/* Log Details Modal with Blur */}
         {showLogModal && selectedLog && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowLogModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1093,11 +1074,11 @@ export default function AuditLogs() {
           </>
         )}
 
-        {/* Clear Confirmation Modal */}
+        {/* Clear Confirmation Modal with Blur */}
         {showClearModal && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowClearModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1179,11 +1160,11 @@ export default function AuditLogs() {
           </>
         )}
 
-        {/* Information Modal */}
+        {/* Information Modal with Blur */}
         {showInfoModal && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowInfoModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

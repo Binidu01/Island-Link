@@ -216,6 +216,20 @@ export default function HOManagerHome() {
     }
   }
 
+  // Navigate to manage products page with filter or edit
+  const navigateToManageProducts = (productId?: string, filterType?: string) => {
+    if (productId) {
+      // If product ID is provided, navigate to edit that specific product
+      window.location.href = `/manage-products?edit=${productId}`
+    } else if (filterType === 'low-stock') {
+      // Navigate with low stock filter
+      window.location.href = '/manage-products?filter=low-stock'
+    } else {
+      // Default navigation
+      window.location.href = '/manage-products'
+    }
+  }
+
   // Format Firestore timestamp
   const formatTimestamp = (timestamp: any) => {
     if (!timestamp) return 'N/A'
@@ -584,9 +598,9 @@ export default function HOManagerHome() {
         <div className="mb-8">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a
-              href="/manage-products"
-              className="p-4 bg-linear-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-100 hover:border-blue-200 transition group"
+            <button
+              onClick={() => (window.location.href = '/manage-products')}
+              className="p-4 bg-linear-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-100 hover:border-blue-200 transition group cursor-pointer text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center group-hover:scale-105 transition">
@@ -609,11 +623,11 @@ export default function HOManagerHome() {
                   <p className="text-sm text-gray-600">Add new product to inventory</p>
                 </div>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/manage-orders"
-              className="p-4 bg-linear-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100 hover:border-purple-200 transition group"
+            <button
+              onClick={() => (window.location.href = '/manage-orders')}
+              className="p-4 bg-linear-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100 hover:border-purple-200 transition group cursor-pointer text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center group-hover:scale-105 transition">
@@ -636,11 +650,11 @@ export default function HOManagerHome() {
                   <p className="text-sm text-gray-600">Review and process new orders</p>
                 </div>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/manage-products"
-              className="p-4 bg-linear-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:border-green-200 transition group"
+            <button
+              onClick={() => (window.location.href = '/manage-products')}
+              className="p-4 bg-linear-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:border-green-200 transition group cursor-pointer text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-linear-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center group-hover:scale-105 transition">
@@ -663,11 +677,11 @@ export default function HOManagerHome() {
                   <p className="text-sm text-gray-600">Update stock levels</p>
                 </div>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/q&a"
-              className="p-4 bg-linear-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-100 hover:border-orange-200 transition group"
+            <button
+              onClick={() => (window.location.href = '/q&a')}
+              className="p-4 bg-linear-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-100 hover:border-orange-200 transition group cursor-pointer text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-linear-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center group-hover:scale-105 transition">
@@ -690,11 +704,11 @@ export default function HOManagerHome() {
                   <p className="text-sm text-gray-600">Answer product questions</p>
                 </div>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/manage-products?filter=low-stock"
-              className="p-4 bg-linear-to-br from-red-50 to-rose-50 rounded-xl border border-red-100 hover:border-red-200 transition group"
+            <button
+              onClick={() => navigateToManageProducts(undefined, 'low-stock')}
+              className="p-4 bg-linear-to-br from-red-50 to-rose-50 rounded-xl border border-red-100 hover:border-red-200 transition group cursor-pointer text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-linear-to-br from-red-500 to-rose-500 rounded-lg flex items-center justify-center group-hover:scale-105 transition">
@@ -717,11 +731,11 @@ export default function HOManagerHome() {
                   <p className="text-sm text-gray-600">Review low stock items</p>
                 </div>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/manage-users"
-              className="p-4 bg-linear-to-br from-indigo-50 to-violet-50 rounded-xl border border-indigo-100 hover:border-indigo-200 transition group"
+            <button
+              onClick={() => (window.location.href = '/manage-users')}
+              className="p-4 bg-linear-to-br from-indigo-50 to-violet-50 rounded-xl border border-indigo-100 hover:border-indigo-200 transition group cursor-pointer text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-linear-to-br from-indigo-500 to-violet-500 rounded-lg flex items-center justify-center group-hover:scale-105 transition">
@@ -744,7 +758,7 @@ export default function HOManagerHome() {
                   <p className="text-sm text-gray-600">View registered users</p>
                 </div>
               </div>
-            </a>
+            </button>
           </div>
         </div>
 
@@ -754,9 +768,12 @@ export default function HOManagerHome() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="font-bold text-gray-900">Recent Orders</h3>
-              <a href="/manage-orders" className="text-sm text-blue-600 hover:text-blue-800">
+              <button
+                onClick={() => (window.location.href = '/manage-orders')}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
                 View all →
-              </a>
+              </button>
             </div>
             <div className="divide-y divide-gray-200">
               {loading ? (
@@ -816,9 +833,12 @@ export default function HOManagerHome() {
                   </span>
                 )}
               </div>
-              <a href="/manage-products" className="text-sm text-blue-600 hover:text-blue-800">
+              <button
+                onClick={() => navigateToManageProducts(undefined, 'low-stock')}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
                 View all →
-              </a>
+              </button>
             </div>
             <div className="divide-y divide-gray-200">
               {loading ? (
@@ -970,8 +990,8 @@ export default function HOManagerHome() {
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   <span className="text-xs text-gray-600">Good Stock</span>
                 </div>
-                <a
-                  href="/manage-products"
+                <button
+                  onClick={() => navigateToManageProducts()}
                   className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
                 >
                   Manage Products
@@ -983,7 +1003,7 @@ export default function HOManagerHome() {
                       d="M14 5l7 7m0 0l-7 7m7-7H3"
                     />
                   </svg>
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -1057,9 +1077,9 @@ export default function HOManagerHome() {
                       </div>
                     </div>
                     <div className="flex items-center justify-between mt-4">
-                      <a
-                        href={`/manage-products/edit?id=${product.id}`}
-                        className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition flex items-center gap-2"
+                      <button
+                        onClick={() => navigateToManageProducts(product.id)}
+                        className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition flex items-center gap-2 cursor-pointer"
                       >
                         <svg
                           className="w-4 h-4"
@@ -1075,11 +1095,11 @@ export default function HOManagerHome() {
                           />
                         </svg>
                         Edit Stock
-                      </a>
+                      </button>
                       {product.stock < 20 && (
-                        <a
-                          href={`/manage-products/edit?id=${product.id}`}
-                          className="px-3 py-1.5 bg-linear-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition flex items-center gap-2"
+                        <button
+                          onClick={() => navigateToManageProducts(product.id)}
+                          className="px-3 py-1.5 bg-linear-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition flex items-center gap-2 cursor-pointer"
                         >
                           <svg
                             className="w-4 h-4"
@@ -1095,7 +1115,7 @@ export default function HOManagerHome() {
                             />
                           </svg>
                           Restock
-                        </a>
+                        </button>
                       )}
                     </div>
                   </div>

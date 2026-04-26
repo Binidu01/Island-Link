@@ -1,3 +1,5 @@
+'use client'
+
 import { onAuthStateChanged } from 'firebase/auth'
 import {
   collection,
@@ -101,7 +103,7 @@ interface ProvinceGroup {
   estimatedDeliveryDays?: number
 }
 
-// Success Modal Component
+// Success Modal Component with Blur
 const SuccessModal: React.FC<{
   isOpen: boolean
   onClose: () => void
@@ -118,113 +120,119 @@ const SuccessModal: React.FC<{
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-            <button
-              onClick={onClose}
-              aria-label="Close success modal"
-              className="p-2 hover:bg-gray-100 rounded-lg transition"
-            >
-              <svg
-                className="w-6 h-6 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
+    <>
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+        onClick={onClose}
+      />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+              <button
+                onClick={onClose}
+                aria-label="Close success modal"
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4">
-            <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
+                <svg
+                  className="w-6 h-6 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
 
-          <p className="text-gray-700 text-center mb-4">{message}</p>
+          <div className="p-6">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+            </div>
 
-          {deliveryDetails && deliveryDetails.length > 0 && (
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <h4 className="font-semibold text-gray-900 mb-2">Delivery Planning Results:</h4>
-              <ul className="space-y-2 text-sm">
-                {deliveryDetails.map((detail, index) => (
-                  <li key={index} className="border-b pb-2 last:border-0">
-                    <div className="text-green-700">
-                      <div className="flex items-center gap-2">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        <div>
-                          <div className="font-medium">{detail.province}</div>
-                          <div className="text-xs text-gray-600">
-                            {detail.orderCount} orders • {detail.deliveryAreas} delivery areas
-                            {detail.assignedDrivers && ` • ${detail.assignedDrivers} drivers`}
+            <p className="text-gray-700 text-center mb-4">{message}</p>
+
+            {deliveryDetails && deliveryDetails.length > 0 && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-2">Delivery Planning Results:</h4>
+                <ul className="space-y-2 text-sm">
+                  {deliveryDetails.map((detail, index) => (
+                    <li key={index} className="border-b pb-2 last:border-0">
+                      <div className="text-green-700">
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <div>
+                            <div className="font-medium">{detail.province}</div>
+                            <div className="text-xs text-gray-600">
+                              {detail.orderCount} orders • {detail.deliveryAreas} delivery areas
+                              {detail.assignedDrivers && ` • ${detail.assignedDrivers} drivers`}
+                            </div>
                           </div>
                         </div>
+                        {detail.deliveryRoutes && (
+                          <div className="text-xs text-gray-500 ml-6 mt-1">
+                            Created {detail.deliveryRoutes} optimized delivery routes
+                          </div>
+                        )}
                       </div>
-                      {detail.deliveryRoutes && (
-                        <div className="text-xs text-gray-500 ml-6 mt-1">
-                          Created {detail.deliveryRoutes} optimized delivery routes
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={onClose}
-              className="px-6 py-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition"
-            >
-              OK
-            </button>
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={onClose}
+                className="px-6 py-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition"
+              >
+                OK
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
-// Error Modal Component
+// Error Modal Component with Blur
 const ErrorModal: React.FC<{
   isOpen: boolean
   onClose: () => void
@@ -234,71 +242,77 @@ const ErrorModal: React.FC<{
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-            <button
-              onClick={onClose}
-              aria-label="Close error modal"
-              className="p-2 hover:bg-gray-100 rounded-lg transition"
-            >
-              <svg
-                className="w-6 h-6 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
+    <>
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+        onClick={onClose}
+      />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+              <button
+                onClick={onClose}
+                aria-label="Close error modal"
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4">
-            <div className="h-12 w-12 bg-red-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+                <svg
+                  className="w-6 h-6 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
 
-          <p className="text-gray-700 text-center mb-4">{message}</p>
+          <div className="p-6">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-12 w-12 bg-red-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+            </div>
 
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={onClose}
-              className="px-6 py-2 bg-linear-to-r from-red-500 to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition"
-            >
-              OK
-            </button>
+            <p className="text-gray-700 text-center mb-4">{message}</p>
+
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={onClose}
+                className="px-6 py-2 bg-linear-to-r from-red-500 to-red-600 text-white font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition"
+              >
+                OK
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
-// Order Details Modal Component
+// Order Details Modal Component with Blur
 const OrderDetailsModal: React.FC<{
   isOpen: boolean
   onClose: () => void
@@ -346,219 +360,227 @@ const OrderDetailsModal: React.FC<{
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
-            <button
-              onClick={onClose}
-              aria-label="Close order details"
-              className="p-2 hover:bg-gray-100 rounded-lg transition"
-            >
-              <svg
-                className="w-6 h-6 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
+    <>
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+        onClick={onClose}
+      />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
+              <button
+                onClick={onClose}
+                aria-label="Close order details"
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+                <svg
+                  className="w-6 h-6 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-2">Order Information</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Order ID:</span>
-                  <span className="font-medium text-gray-900">{order.id}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Order Number:</span>
-                  <span className="font-medium text-gray-900">
-                    {order.orderNumber || `ORD-${order.id.slice(-6).toUpperCase()}`}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Status:</span>
-                  <span
-                    className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(order.status)}`}
-                  >
-                    {order.status || 'Processing'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Created:</span>
-                  <span className="font-medium text-gray-900">{formatDate(order.createdAt)}</span>
-                </div>
-                {order.updatedAt && (
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-2">Order Information</h3>
+                <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Last Updated:</span>
-                    <span className="font-medium text-gray-900">{formatDate(order.updatedAt)}</span>
+                    <span className="text-gray-600">Order ID:</span>
+                    <span className="font-medium text-gray-900">{order.id}</span>
                   </div>
-                )}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Order Number:</span>
+                    <span className="font-medium text-gray-900">
+                      {order.orderNumber || `ORD-${order.id.slice(-6).toUpperCase()}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Status:</span>
+                    <span
+                      className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(order.status)}`}
+                    >
+                      {order.status || 'Processing'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Created:</span>
+                    <span className="font-medium text-gray-900">{formatDate(order.createdAt)}</span>
+                  </div>
+                  {order.updatedAt && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Last Updated:</span>
+                      <span className="font-medium text-gray-900">{formatDate(order.updatedAt)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-2">Customer Information</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Name:</span>
+                    <span className="font-medium text-gray-900">
+                      {order.shippingInfo?.fullName || order.customerName || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Email:</span>
+                    <span className="font-medium text-gray-900">
+                      {order.shippingInfo?.email || order.userEmail || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Phone:</span>
+                    <span className="font-medium text-gray-900">
+                      {order.shippingInfo?.phone || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Payment Method:</span>
+                    <span className="font-medium text-gray-900">
+                      {order.paymentMethod ? order.paymentMethod.toUpperCase() : 'COD'}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-2">Customer Information</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Name:</span>
-                  <span className="font-medium text-gray-900">
-                    {order.shippingInfo?.fullName || order.customerName || 'N/A'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Email:</span>
-                  <span className="font-medium text-gray-900">
-                    {order.shippingInfo?.email || order.userEmail || 'N/A'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Phone:</span>
-                  <span className="font-medium text-gray-900">
-                    {order.shippingInfo?.phone || 'N/A'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Payment Method:</span>
-                  <span className="font-medium text-gray-900">
-                    {order.paymentMethod ? order.paymentMethod.toUpperCase() : 'COD'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="font-semibold text-gray-900 mb-3">Shipping Information</h3>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-gray-600 mb-1">Address:</p>
-                  <p className="font-medium text-gray-900">
-                    {order.shippingInfo?.address || order.deliveryAddress || 'N/A'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600 mb-1">City:</p>
-                  <p className="font-medium text-gray-900">{order.shippingInfo?.city || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 mb-1">Postal Code:</p>
-                  <p className="font-medium text-gray-900">
-                    {order.shippingInfo?.postalCode || 'N/A'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600 mb-1">Notes:</p>
-                  <p className="font-medium text-gray-900">
-                    {order.shippingInfo?.notes || order.notes || 'No notes'}
-                  </p>
+            <div className="mb-6">
+              <h3 className="font-semibold text-gray-900 mb-3">Shipping Information</h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-gray-600 mb-1 text-sm">Address:</p>
+                    <p className="font-medium text-gray-900 text-sm">
+                      {order.shippingInfo?.address || order.deliveryAddress || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 mb-1 text-sm">City:</p>
+                    <p className="font-medium text-gray-900 text-sm">
+                      {order.shippingInfo?.city || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 mb-1 text-sm">Postal Code:</p>
+                    <p className="font-medium text-gray-900 text-sm">
+                      {order.shippingInfo?.postalCode || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 mb-1 text-sm">Notes:</p>
+                    <p className="font-medium text-gray-900 text-sm">
+                      {order.shippingInfo?.notes || order.notes || 'No notes'}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="mb-6">
-            <h3 className="font-semibold text-gray-900 mb-3">
-              Order Items ({order.items?.length || 0})
-            </h3>
-            <div className="bg-gray-50 rounded-lg overflow-hidden">
-              <table className="min-w-full">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Product
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Quantity
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Price
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                      Subtotal
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {order.items?.map((item, index) => (
-                    <tr key={index}>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center">
-                          {item.imageURL && (
-                            <img
-                              src={item.imageURL}
-                              alt={item.productName || 'Product'}
-                              className="h-10 w-10 rounded object-cover mr-3"
-                            />
-                          )}
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {item.productName || 'Product'}
-                            </p>
-                            <p className="text-sm text-gray-500">SKU: {item.sku || 'N/A'}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-gray-900 font-medium">{item.quantity}</td>
-                      <td className="px-4 py-3 text-gray-900 font-medium">
-                        {formatCurrency(item.price)}
-                      </td>
-                      <td className="px-4 py-3 text-gray-900 font-bold">
-                        {formatCurrency(item.price * item.quantity)}
-                      </td>
+            <div className="mb-6">
+              <h3 className="font-semibold text-gray-900 mb-3">
+                Order Items ({order.items?.length || 0})
+              </h3>
+              <div className="bg-gray-50 rounded-lg overflow-hidden">
+                <table className="min-w-full">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                        Product
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                        Quantity
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                        Price
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                        Subtotal
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {order.items?.map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center">
+                            {item.imageURL && (
+                              <img
+                                src={item.imageURL}
+                                alt={item.productName || 'Product'}
+                                className="h-10 w-10 rounded object-cover mr-3"
+                              />
+                            )}
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {item.productName || 'Product'}
+                              </p>
+                              <p className="text-sm text-gray-500">SKU: {item.sku || 'N/A'}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-gray-900 font-medium">{item.quantity}</td>
+                        <td className="px-4 py-3 text-gray-900 font-medium">
+                          {formatCurrency(item.price)}
+                        </td>
+                        <td className="px-4 py-3 text-gray-900 font-bold">
+                          {formatCurrency(item.price * item.quantity)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
 
-          <div className="mb-6">
-            <h3 className="font-semibold text-gray-900 mb-3">Order Summary</h3>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal:</span>
-                  <span className="font-medium text-gray-900">
-                    {formatCurrency(order.subtotal || order.totalAmount || 0)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping:</span>
-                  <span className="font-medium text-gray-900">
-                    {formatCurrency(order.shipping || 0)}
-                  </span>
-                </div>
-                <div className="flex justify-between border-t border-gray-300 pt-2">
-                  <span className="text-lg font-semibold text-gray-900">Total:</span>
-                  <span className="text-lg font-bold text-gray-900">
-                    {formatCurrency(order.total || order.totalAmount || 0)}
-                  </span>
+            <div className="mb-6">
+              <h3 className="font-semibold text-gray-900 mb-3">Order Summary</h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Subtotal:</span>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(order.subtotal || order.totalAmount || 0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Shipping:</span>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(order.shipping || 0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between border-t border-gray-300 pt-2">
+                    <span className="text-lg font-semibold text-gray-900">Total:</span>
+                    <span className="text-lg font-bold text-gray-900">
+                      {formatCurrency(order.total || order.totalAmount || 0)}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
-// Province Card Component
+// Province Card Component - Fully Fixed with Better Visibility
 const ProvinceCard: React.FC<{
   provinceGroup: ProvinceGroup
   onSelectAll: () => void
@@ -599,6 +621,8 @@ const ProvinceCard: React.FC<{
         button: string
         iconBg: string
         iconColor: string
+        badgeBg: string
+        badgeText: string
       }
     > = {
       'Northern Province': {
@@ -608,8 +632,10 @@ const ProvinceCard: React.FC<{
         border: 'border-blue-200',
         text: 'text-blue-800',
         button: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       },
       'Southern Province': {
         bgFrom: 'from-green-500',
@@ -618,8 +644,10 @@ const ProvinceCard: React.FC<{
         border: 'border-green-200',
         text: 'text-green-800',
         button: 'bg-green-100 text-green-700 hover:bg-green-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       },
       'Western Province': {
         bgFrom: 'from-purple-500',
@@ -628,8 +656,10 @@ const ProvinceCard: React.FC<{
         border: 'border-purple-200',
         text: 'text-purple-800',
         button: 'bg-purple-100 text-purple-700 hover:bg-purple-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       },
       'Eastern Province': {
         bgFrom: 'from-orange-500',
@@ -638,8 +668,10 @@ const ProvinceCard: React.FC<{
         border: 'border-orange-200',
         text: 'text-orange-800',
         button: 'bg-orange-100 text-orange-700 hover:bg-orange-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       },
       'Central Province': {
         bgFrom: 'from-red-500',
@@ -648,8 +680,10 @@ const ProvinceCard: React.FC<{
         border: 'border-red-200',
         text: 'text-red-800',
         button: 'bg-red-100 text-red-700 hover:bg-red-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       },
       'North Western Province': {
         bgFrom: 'from-indigo-500',
@@ -658,8 +692,10 @@ const ProvinceCard: React.FC<{
         border: 'border-indigo-200',
         text: 'text-indigo-800',
         button: 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       },
       'North Central Province': {
         bgFrom: 'from-cyan-500',
@@ -668,8 +704,10 @@ const ProvinceCard: React.FC<{
         border: 'border-cyan-200',
         text: 'text-cyan-800',
         button: 'bg-cyan-100 text-cyan-700 hover:bg-cyan-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       },
       'Uva Province': {
         bgFrom: 'from-yellow-500',
@@ -678,8 +716,10 @@ const ProvinceCard: React.FC<{
         border: 'border-yellow-200',
         text: 'text-yellow-800',
         button: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       },
       'Sabaragamuwa Province': {
         bgFrom: 'from-pink-500',
@@ -688,8 +728,10 @@ const ProvinceCard: React.FC<{
         border: 'border-pink-200',
         text: 'text-pink-800',
         button: 'bg-pink-100 text-pink-700 hover:bg-pink-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       },
     }
 
@@ -701,8 +743,10 @@ const ProvinceCard: React.FC<{
         border: 'border-gray-200',
         text: 'text-gray-800',
         button: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-        iconBg: 'bg-white bg-opacity-20',
+        iconBg: 'bg-white/20',
         iconColor: 'text-white',
+        badgeBg: 'bg-white/30',
+        badgeText: 'text-white',
       }
     )
   }
@@ -725,13 +769,14 @@ const ProvinceCard: React.FC<{
 
   return (
     <div
-      className={`bg-linear-to-r ${colors.bgFrom} ${colors.bgTo} rounded-xl shadow-lg border ${colors.border} overflow-hidden h-full flex flex-col`}
+      className={`bg-gradient-to-r ${colors.bgFrom} ${colors.bgTo} rounded-xl shadow-lg border ${colors.border} overflow-hidden h-full flex flex-col`}
     >
+      {/* Header Section - Improved visibility */}
       <div className="p-4 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
-              className={`h-10 w-10 ${colors.iconBg} rounded-full flex items-center justify-center ${colors.iconColor}`}
+              className={`h-10 w-10 ${colors.iconBg} rounded-full flex items-center justify-center ${colors.iconColor} backdrop-blur-sm`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -749,15 +794,15 @@ const ProvinceCard: React.FC<{
               </svg>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">{provinceGroup.province}</h3>
+              <h3 className="text-lg font-bold text-white drop-shadow-md">{provinceGroup.province}</h3>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-white text-xs bg-white bg-opacity-30 px-2 py-1 rounded">
+                <span className={`text-white text-xs ${colors.badgeBg} backdrop-blur-sm px-2 py-1 rounded font-medium`}>
                   {provinceGroup.orderCount} orders
                 </span>
-                <span className="text-white text-xs bg-white bg-opacity-20 px-2 py-1 rounded">
+                <span className={`text-white text-xs ${colors.badgeBg} backdrop-blur-sm px-2 py-1 rounded font-medium`}>
                   {provinceGroup.cities.length} cities
                 </span>
-                <span className="text-white text-xs bg-white bg-opacity-20 px-2 py-1 rounded">
+                <span className={`text-white text-xs ${colors.badgeBg} backdrop-blur-sm px-2 py-1 rounded font-medium`}>
                   ~{getDeliveryDays()}
                 </span>
               </div>
@@ -766,32 +811,34 @@ const ProvinceCard: React.FC<{
           <div className="flex items-center gap-3">
             <button
               onClick={onSelectAll}
-              className={`px-3 py-1 bg-white ${colors.text} text-sm font-semibold rounded-lg hover:opacity-90 transition`}
+              className={`px-3 py-1 bg-white ${colors.text} text-sm font-semibold rounded-lg hover:opacity-90 transition shadow-sm`}
             >
               {allSelected ? 'Deselect All' : 'Select All'}
             </button>
           </div>
         </div>
 
-        <div className="mt-2 flex flex-wrap gap-2">
+        {/* Cities Section - Better visibility with backdrop blur */}
+        <div className="mt-3 flex flex-wrap gap-2">
           {provinceGroup.cities.slice(0, 5).map((city, index) => (
             <span
               key={index}
-              className="text-white text-xs opacity-90 bg-white bg-opacity-20 px-2 py-1 rounded"
+              className={`text-white text-xs ${colors.badgeBg} backdrop-blur-sm px-2 py-1 rounded font-medium`}
             >
               {city}
             </span>
           ))}
           {provinceGroup.cities.length > 5 && (
-            <span className="text-white text-xs opacity-90 bg-white bg-opacity-20 px-2 py-1 rounded">
+            <span className={`text-white text-xs ${colors.badgeBg} backdrop-blur-sm px-2 py-1 rounded font-medium`}>
               +{provinceGroup.cities.length - 5} more
             </span>
           )}
         </div>
 
-        <div className="mt-3 flex items-center justify-between text-white text-sm">
+        {/* Delivery Stats Section - Improved visibility */}
+        <div className="mt-3 flex items-center justify-between text-white">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-1 rounded">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -800,9 +847,9 @@ const ProvinceCard: React.FC<{
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span>Est: {getDeliveryDays()}</span>
+              <span className="text-sm font-medium">Est: {getDeliveryDays()}</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-1 rounded">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -811,23 +858,24 @@ const ProvinceCard: React.FC<{
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <span>
+              <span className="text-sm font-medium">
                 {getDriverCount()} driver{getDriverCount() > 1 ? 's' : ''}
               </span>
             </div>
           </div>
-          <div className="text-right">
-            <span className="font-semibold">{formatCurrency(provinceGroup.totalValue)}</span>
+          <div className="text-right bg-black/20 backdrop-blur-sm px-2 py-1 rounded">
+            <span className="font-semibold text-white">{formatCurrency(provinceGroup.totalValue)}</span>
           </div>
         </div>
       </div>
 
+      {/* Orders List Section */}
       <div className={`p-4 ${colors.bgLight} grow overflow-auto`}>
         <div className="space-y-3">
           {provinceGroup.orders.map((order) => (
             <div
               key={order.id}
-              className={`flex items-center justify-between p-3 bg-white rounded-lg border ${colors.border} hover:${colors.bgLight} transition`}
+              className={`flex items-center justify-between p-3 bg-white rounded-lg border ${colors.border} hover:shadow-md transition-all duration-200`}
             >
               <div className="flex items-center gap-4 flex-1">
                 <input
@@ -835,7 +883,7 @@ const ProvinceCard: React.FC<{
                   checked={selectedOrders.includes(order.id)}
                   onChange={() => onSelectOrder(order.id)}
                   aria-label={`Select order ${getOrderNumber(order)}`}
-                  className={`h-4 w-4 ${colors.text} rounded focus:ring-${colors.text.split('-')[1]}-500`}
+                  className={`h-4 w-4 ${colors.text} rounded focus:ring-2 focus:ring-offset-2 focus:ring-${colors.text.split('-')[1]}-500`}
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
@@ -851,7 +899,13 @@ const ProvinceCard: React.FC<{
                     </div>
                   </div>
                   <div className="mt-2 flex items-center justify-between text-sm">
-                    <span className="text-gray-600">{getCityFromAddress(order)}</span>
+                    <span className="text-gray-600 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {getCityFromAddress(order)}
+                    </span>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => viewOrderDetails(order)}
@@ -867,10 +921,11 @@ const ProvinceCard: React.FC<{
           ))}
         </div>
 
+        {/* Footer Summary Section */}
         <div className="mt-4 pt-4 border-t border-gray-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className={`text-sm ${colors.text}`}>
+              <p className={`text-sm ${colors.text} font-medium`}>
                 Selected:{' '}
                 <span className="font-bold">
                   {selectedCount}/{provinceGroup.orders.length}
@@ -998,32 +1053,24 @@ export default function LogisticsOrders() {
       mullaitivu: 'Northern Province',
       vavuniya: 'Northern Province',
       vanni: 'Northern Province',
-
       galle: 'Southern Province',
       matara: 'Southern Province',
       hambantota: 'Southern Province',
-
       colombo: 'Western Province',
       gampaha: 'Western Province',
       kalutara: 'Western Province',
-
       batticaloa: 'Eastern Province',
       trincomalee: 'Eastern Province',
       ampara: 'Eastern Province',
-
       kandy: 'Central Province',
       matale: 'Central Province',
       'nuwara eliya': 'Central Province',
-
       kurunegala: 'North Western Province',
       puttalam: 'North Western Province',
-
       anuradhapura: 'North Central Province',
       polonnaruwa: 'North Central Province',
-
       badulla: 'Uva Province',
       monaragala: 'Uva Province',
-
       ratnapura: 'Sabaragamuwa Province',
       kegalle: 'Sabaragamuwa Province',
     }
@@ -1140,7 +1187,6 @@ export default function LogisticsOrders() {
       const sessionId = `route-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       const routeSessionRef = doc(db, 'routeSessions', sessionId)
 
-      // Get order details for selected orders
       const selectedOrderDetails = processingOrders
         .filter((order) => orderIds.includes(order.id))
         .map((order) => ({
@@ -1161,7 +1207,7 @@ export default function LogisticsOrders() {
         selectedOrderIds: orderIds,
         selectedOrderDetails,
         createdAt: new Date(),
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes expiration
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
         isActive: true,
       }
 
@@ -1225,10 +1271,8 @@ export default function LogisticsOrders() {
         return
       }
 
-      // Save selected orders to Firestore
       const sessionId = await saveSelectedOrdersToFirestore(ordersWithCoordinates.map((o) => o.id))
 
-      // Save audit log
       await saveAuditLog(
         'Send to Route Planner',
         `Sent ${ordersWithCoordinates.length} orders to route planner. Session: ${sessionId}`,
@@ -1237,7 +1281,6 @@ export default function LogisticsOrders() {
         'success'
       )
 
-      // Navigate to route planner with session ID
       navigate(`/route?session=${sessionId}`)
     } catch (error) {
       console.error('Error sending to route planner:', error)
@@ -1471,7 +1514,7 @@ export default function LogisticsOrders() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading delivery orders...</p>
@@ -1482,7 +1525,7 @@ export default function LogisticsOrders() {
 
   if (!logisticsStaff) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500 mx-auto mb-4"></div>
           <p className="text-gray-600">Redirecting to home page...</p>
@@ -1492,7 +1535,7 @@ export default function LogisticsOrders() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
       <LogisticsNavbar />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -1505,7 +1548,7 @@ export default function LogisticsOrders() {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-linear-to-r from-green-500 to-blue-600 text-white text-sm font-semibold rounded-full">
+              <span className="px-3 py-1 bg-gradient-to-r from-green-500 to-blue-600 text-white text-sm font-semibold rounded-full">
                 Delivery Planning
               </span>
             </div>
@@ -1513,29 +1556,29 @@ export default function LogisticsOrders() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow p-4 border border-gray-100">
+          <div className="bg-white rounded-xl shadow p-4 border border-gray-200">
             <p className="text-sm text-gray-600">Total Orders</p>
             <p className="text-2xl font-bold text-gray-900 mt-2">{stats.total}</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-4 border border-gray-100">
+          <div className="bg-white rounded-xl shadow p-4 border border-gray-200">
             <p className="text-sm text-gray-600">Processing</p>
             <p className="text-2xl font-bold text-yellow-600 mt-2">{stats.processing}</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-4 border border-gray-100">
+          <div className="bg-white rounded-xl shadow p-4 border border-gray-200">
             <p className="text-sm text-gray-600">Ready for Delivery</p>
             <p className="text-2xl font-bold text-blue-600 mt-2">{processingOrders.length}</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-4 border border-gray-100">
+          <div className="bg-white rounded-xl shadow p-4 border border-gray-200">
             <p className="text-sm text-gray-600">Provinces</p>
             <p className="text-2xl font-bold text-purple-600 mt-2">{provinceGroups.length}</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-4 border border-gray-100">
+          <div className="bg-white rounded-xl shadow p-4 border border-gray-200">
             <p className="text-sm text-gray-600">Cities</p>
             <p className="text-2xl font-bold text-indigo-600 mt-2">
               {provinceGroups.reduce((sum, g) => sum + g.cities.length, 0)}
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow p-4 border border-gray-100">
+          <div className="bg-white rounded-xl shadow p-4 border border-gray-200">
             <p className="text-sm text-gray-600">Total Value</p>
             <p className="text-2xl font-bold text-green-600 mt-2">
               {formatCurrency(
@@ -1543,13 +1586,13 @@ export default function LogisticsOrders() {
                   (sum, order) => sum + (order.total || order.totalAmount || 0),
                   0
                 )
-              ).replace('LKR', '')}
+              )}
             </p>
           </div>
         </div>
 
         {selectedOrders.length > 0 && (
-          <div className="bg-linear-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-4 mb-6">
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-4 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold">
@@ -1558,7 +1601,7 @@ export default function LogisticsOrders() {
                 <p className="text-white font-medium">
                   {selectedOrders.length} order{selectedOrders.length > 1 ? 's' : ''} selected
                 </p>
-                <div className="text-white text-sm bg-white bg-opacity-30 px-2 py-1 rounded">
+                <div className="text-white text-sm bg-white/30 px-2 py-1 rounded backdrop-blur-sm">
                   {
                     processingOrders.filter(
                       (o) =>
@@ -1574,7 +1617,7 @@ export default function LogisticsOrders() {
                 <button
                   onClick={sendToRoutePlanner}
                   disabled={processing}
-                  className="px-4 py-2 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition disabled:opacity-50 flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -1627,7 +1670,7 @@ export default function LogisticsOrders() {
             <p className="text-sm text-gray-400 mt-1">Grouping orders by province</p>
           </div>
         ) : provinceGroups.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 bg-white rounded-xl shadow-lg">
             <svg
               className="w-16 h-16 mx-auto text-gray-300 mb-4"
               fill="currentColor"
@@ -1661,11 +1704,11 @@ export default function LogisticsOrders() {
               ))}
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Delivery Planning Summary</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 {provinceGroups.map((group) => (
-                  <div key={group.id} className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                  <div key={group.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-gray-900">{group.province}</p>

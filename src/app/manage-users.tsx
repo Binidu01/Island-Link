@@ -898,11 +898,11 @@ export default function ManageUsers() {
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
+        {/* Delete Confirmation Modal with Blur */}
         {showDeleteModal && userToDelete && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => !deleting && setShowDeleteModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -982,11 +982,11 @@ export default function ManageUsers() {
           </>
         )}
 
-        {/* Edit User Modal */}
+        {/* Edit User Modal with Blur */}
         {showEditModal && userToEdit && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowEditModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1214,11 +1214,11 @@ export default function ManageUsers() {
           </>
         )}
 
-        {/* Add User Modal */}
+        {/* Add User Modal with Blur */}
         {showAddModal && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowAddModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1440,11 +1440,11 @@ export default function ManageUsers() {
           </>
         )}
 
-        {/* Password Prompt Modal */}
+        {/* Password Prompt Modal with Blur */}
         {showPasswordModal && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => {
                 setShowPasswordModal(false)
                 setAdminPassword('')
@@ -1568,11 +1568,11 @@ export default function ManageUsers() {
           </>
         )}
 
-        {/* Success Modal */}
+        {/* Success Modal with Blur */}
         {showSuccessModal && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowSuccessModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1627,11 +1627,11 @@ export default function ManageUsers() {
           </>
         )}
 
-        {/* Error Modal */}
+        {/* Error Modal with Blur */}
         {showErrorModal && (
           <>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
               onClick={() => setShowErrorModal(false)}
             />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
