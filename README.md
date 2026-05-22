@@ -2,81 +2,111 @@
 
 # Island-Link
 
-A full-stack e-commerce and supply-chain management platform built for Sri Lanka's regional distribution network.
+**A full-stack e-commerce and supply-chain management platform built for Sri Lanka's regional distribution network.**
 
-![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?style=for-the-badge&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![TailwindCSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
 
 [![Stars](https://img.shields.io/github/stars/Binidu01/Island-Link?style=for-the-badge&logo=github)](https://github.com/Binidu01/Island-Link/stargazers)
 [![Forks](https://img.shields.io/github/forks/Binidu01/Island-Link?style=for-the-badge&logo=github)](https://github.com/Binidu01/Island-Link/network/members)
 [![Issues](https://img.shields.io/github/issues/Binidu01/Island-Link?style=for-the-badge&logo=github)](https://github.com/Binidu01/Island-Link/issues)
-[![License](https://img.shields.io/github/license/Binidu01/Island-Link?style=for-the-badge)](https://github.com/Binidu01/Island-Link/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/Binidu01/Island-Link?style=for-the-badge)](LICENSE)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [🚀 Features](#-features)
-- [🛠️ Installation](#️-installation)
-- [💻 Usage](#-usage)
-- [🏗️ Built With](#️-built-with)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [📞 Contact](#-contact)
-- [🙏 Acknowledgments](#-acknowledgments)
-
----
-
-## 🚀 Features
-
-- 👥 **Multi-role dashboards** — Admin, HO Manager, RDC Staff, Logistics Team, and Customer
-- 📦 **Product management** — Add, edit, and delete products with WebP image uploads
-- 🔄 **Order lifecycle** — Place → Confirm → Process → Out for Delivery → Delivered / Rejected
-- 🗺️ **Real-time tracking** — Live vehicle location on Leaflet maps with OSRM route optimisation
-- 📧 **Email notifications** — Automatic order status updates via Brevo SMTP
-- 🔒 **Audit logging** — Every admin and staff action recorded for accountability
-- 🛒 **Cart & wishlist** — Firebase-powered persistent cart and wishlist across sessions
-- ⭐ **Reviews & Q&A** — Customers can leave star ratings and ask product questions
-- 🚚 **Route planner** — Logistics team optimises and navigates delivery routes in real time
-- 📱 **Responsive UI** — Tailwind CSS v4 layout that adapts to all screen sizes
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Variables](#environment-variables)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+- [Acknowledgements](#acknowledgements)
 
 ---
 
-## 🛠️ Installation
+## Overview
+
+Island-Link is a comprehensive platform designed to streamline order management, logistics, and customer engagement across Sri Lanka's regional distribution network. It supports multiple user roles — from administrators and warehouse staff to delivery teams and end customers — with real-time tracking, automated notifications, and a fully responsive interface.
+
+---
+
+## Features
+
+| Category | Capability |
+|---|---|
+| **User Roles** | Multi-role dashboards for Admin, HO Manager, RDC Staff, Logistics Team, and Customer |
+| **Product Management** | Add, edit, and delete products with WebP image uploads |
+| **Order Lifecycle** | Full status pipeline: Place → Confirm → Process → Out for Delivery → Delivered / Rejected |
+| **Real-Time Tracking** | Live vehicle location on Leaflet maps with OSRM route optimisation |
+| **Email Notifications** | Automatic order status updates via Brevo REST API (edge-native, no SMTP required) |
+| **Audit Logging** | Every admin and staff action recorded for accountability |
+| **Cart & Wishlist** | Firebase-powered persistent cart and wishlist across sessions |
+| **Reviews & Q&A** | Star ratings and product Q&A from customers |
+| **Route Planner** | Logistics team can optimise and navigate delivery routes in real time |
+| **Responsive UI** | Tailwind CSS v4 layout that adapts to all screen sizes |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | [Bini.js](https://github.com/Binidu01) — Zero-config React framework |
+| Bundler | Vite 8 (Rolldown-powered) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Database & Auth | Firebase (Firestore + Authentication) |
+| Email | Brevo REST API — edge-native transactional email via `fetch` |
+| Maps & Routing | Leaflet + OpenStreetMap + OSRM |
+| API Layer | Hono (bundled with Bini.js) |
+| Environment | bini-env — zero-config, request-scoped env vars |
+| Linting & Formatting | Oxlint & Oxfmt |
+| Profile Images | avatar64 — Base64-encoded images stored in Firestore |
+
+---
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- pnpm (recommended) or npm
+- [Node.js](https://nodejs.org/) v18 or higher
+- [pnpm](https://pnpm.io/) (recommended) or npm
 
-### Quick Start
+### Installation
 
 ```bash
 # Clone the repository
 git clone https://github.com/Binidu01/Island-Link.git
 
-# Navigate to project directory
+# Navigate to the project directory
 cd Island-Link
 
 # Install dependencies
 pnpm install
 
-# Start development server
+# Start the development server
 pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root and populate the following values:
 
 ```env
-# ── Firebase ──────────────────────────────────────
+# ── Firebase ──────────────────────────────────────────────────
 BINI_FIREBASE_API_KEY=
 BINI_FIREBASE_AUTH_DOMAIN=
 BINI_FIREBASE_PROJECT_ID=
@@ -85,15 +115,15 @@ BINI_FIREBASE_MESSAGING_SENDER_ID=
 BINI_FIREBASE_APP_ID=
 BINI_FIREBASE_MEASUREMENT_ID=
 
-# ── Email (Brevo SMTP) ────────────────────────────
-SMTP_USER=
-SMTP_PASS=
-FROM_EMAIL="IslandLink <your@email.com>"
+# ── Email (Brevo REST API) ─────────────────────────────────────
+BREVO_API_KEY=
+FROM_EMAIL=
+SENDER_NAME=
 ```
 
 ---
 
-## 💻 Usage
+## Usage
 
 ```bash
 # Start development server with hot reload
@@ -109,44 +139,31 @@ pnpm start
 pnpm run check
 ```
 
-For more detailed usage instructions, please refer to our [documentation](https://github.com/Binidu01/Island-Link).
+For detailed documentation, refer to the [project wiki](https://github.com/Binidu01/Island-Link/wiki).
 
 ---
 
-## 🏗️ Built With
+## Contributing
 
-- **[Bini.js](https://github.com/Binidu01/bini)** — Zero-config React framework
-- **[Vite 8](https://vitejs.dev/)** — Rolldown-powered bundler
-- **[TypeScript](https://www.typescriptlang.org/)** — Strongly typed JavaScript
-- **[Tailwind CSS v4](https://tailwindcss.com/)** — Utility-first styling
-- **[Firebase](https://firebase.google.com/)** — Firestore database and Authentication
-- **[avatar64](https://github.com/Binidu01/avatar64)** — Profile images encoded as Base64 and stored in Firestore
-- **[Brevo SMTP](https://www.brevo.com/) + [Nodemailer](https://nodemailer.com/)** — Transactional email
-- **[Leaflet](https://leafletjs.com/) + [OpenStreetMap](https://www.openstreetmap.org/) + [OSRM](http://project-osrm.org/)** — Maps and route optimisation
-- **[Hono](https://hono.dev/)** — Lightweight API layer (bundled with Bini.js)
-- **[Oxlint & Oxfmt](https://oxc.rs/)** — Fast linting and formatting
+Contributions are welcome and greatly appreciated. To get started:
 
----
-
-## 🤝 Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch `git checkout -b feature/AmazingFeature`
-3. Commit your Changes `git commit -m 'Add some AmazingFeature'`
-4. Push to the Branch `git push origin feature/AmazingFeature`
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes: `git commit -m 'Add your-feature-name'`
+4. Push to the branch: `git push origin feature/your-feature-name`
 5. Open a Pull Request
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+Please ensure your code passes linting and type-checks (`pnpm run check`) before submitting.
 
 ---
 
-## 📞 Contact
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## Contact
 
 **Binidu Ranasinghe** — [@Binidu01](https://github.com/Binidu01)
 
@@ -154,29 +171,18 @@ Project Link: [https://github.com/Binidu01/Island-Link](https://github.com/Binid
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgements
 
-- Thanks to all contributors who have helped this project grow
-- Special thanks to the open source community
-- Academic supervision provided by **Nimesha Rajakaruna** ([@nimesharajakaruna1-beep](https://github.com/nimesharajakaruna1-beep)) as part of undergraduate coursework
-- Built with ❤️ and lots of ☕
-
----
-
-## Academic Supervision
-
-This project was guided by Nimesha Rajakaruna as part of undergraduate coursework.
-
-GitHub Name: nimesharajakaruna1-beep
+- All contributors who have helped this project grow
+- The open-source community for the incredible tools that power this platform
+- **Academic Supervision:** [Nimesha Rajakaruna](https://github.com/nimesharajakaruna1-beep) — guidance provided as part of undergraduate coursework
 
 ---
 
 <div align="center">
 
-**[⬆ Back to Top](#island-link)**
-
 Made with ❤️ by [Binidu01](https://github.com/Binidu01)
 
-⭐ Star this repo if you find it useful!
+⭐ If you find this project useful, please consider giving it a star!
 
 </div>
