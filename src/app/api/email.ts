@@ -1,35 +1,18 @@
-import { requireEnv } from 'bini-env'
+import { getEnv } from 'bini-env'
 import { Hono } from 'hono'
-import nodemailer from 'nodemailer'
 
 const app = new Hono()
 
 // ─────────────────────────────────────────────
-// ENV — FAIL FAST (NO RUNTIME SURPRISES)
+// HELPERS
 // ─────────────────────────────────────────────
-const SMTP_USER = requireEnv('SMTP_USER')
-const SMTP_PASS = requireEnv('SMTP_PASS')
-const FROM = requireEnv('FROM_EMAIL')
-const NODE_ENV = requireEnv('NODE_ENV')
-
-const isLocal = NODE_ENV !== 'production'
-
-// ─────────────────────────────────────────────
-// SMTP TRANSPORT (HARDENED)
-// ─────────────────────────────────────────────
-const transporter = nodemailer.createTransport({
-  host: 'smtp-relay.brevo.com',
-  port: 587,
-  secure: false,
-  auth: {
-    user: SMTP_USER,
-    pass: SMTP_PASS,
-  },
-  connectionTimeout: 10_000,
-  greetingTimeout: 10_000,
-  socketTimeout: 15_000,
-  ...(isLocal && { tls: { rejectUnauthorized: false } }),
-})
+function requireEnv(ctx: any, key: string): string {
+  const val = getEnv(ctx, key)
+  if (!val) {
+    throw new Error(`[bini-env] Missing required environment variable: "${key}"`)
+  }
+  return val
+}
 
 // ─────────────────────────────────────────────
 // TYPES
@@ -41,14 +24,55 @@ interface EmailRequestBody {
   text?: string
 }
 
+interface BrevoResponse {
+  messageId: string
+}
+
+// ─────────────────────────────────────────────
+// BREVO SEND (EDGE-NATIVE — PLAIN FETCH)
+// ─────────────────────────────────────────────
+async function sendBrevoEmail(
+  apiKey: string,
+  fromEmail: string,
+  senderName: string,
+  to: string,
+  subject: string,
+  html?: string,
+  text?: string
+): Promise<BrevoResponse> {
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender: { name: senderName, email: fromEmail },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+      textContent: text,
+    }),
+  })
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(
+      `Brevo API error ${res.status}: ${(body as any).message || res.statusText}`
+    )
+  }
+
+  return res.json() as Promise<BrevoResponse>
+}
+
 // ─────────────────────────────────────────────
 // BASIC RATE LIMIT (PER-IP, IN-MEMORY)
 // ⚠️ NOT FOR MULTI-SERVER DEPLOYMENTS
 // ─────────────────────────────────────────────
 const rateMap = new Map<string, { count: number; ts: number }>()
 
-const RATE_LIMIT = 5 // max requests
-const WINDOW_MS = 60_000 // per minute
+const RATE_LIMIT = 5
+const WINDOW_MS = 60_000
 
 function getClientIP(c: any): string {
   return c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown'
@@ -81,7 +105,6 @@ function isEmail(s: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
 }
 
-// ⚠️ Replace with real sanitizer in production
 function sanitizeHtml(html: string): string {
   return html
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
@@ -94,33 +117,18 @@ function clamp(s: string, max: number): string {
 }
 
 // ─────────────────────────────────────────────
-// SMTP TIMEOUT WRAPPER
-// ─────────────────────────────────────────────
-async function sendWithTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('SMTP_TIMEOUT')), ms)
-  )
-
-  return Promise.race([promise, timeout])
-}
-
-// ─────────────────────────────────────────────
-// POST /api/test-email
+// POST /api/email
 // ─────────────────────────────────────────────
 app.post('/email', async (c) => {
-  const ip = getClientIP(c)
-
-  if (!checkRateLimit(ip)) {
-    return c.json(
-      {
-        ok: false,
-        error: 'Rate limit exceeded',
-      },
-      429
-    )
-  }
+  const ctx = c as any
 
   try {
+    const ip = getClientIP(c)
+
+    if (!checkRateLimit(ip)) {
+      return c.json({ ok: false, error: 'Rate limit exceeded' }, 429)
+    }
+
     const body = (await c.req.json()) as EmailRequestBody
 
     const to = String(body?.to ?? '').trim()
@@ -143,48 +151,30 @@ app.post('/email', async (c) => {
 
     // ───── SANITIZE + LIMIT ─────
     const subject = clamp(subjectRaw, 140)
-    const text = textRaw ? clamp(textRaw, 10_000) : 'Fallback text'
+    const text = textRaw ? clamp(textRaw, 10_000) : undefined
     const html = htmlRaw ? clamp(sanitizeHtml(htmlRaw), 50_000) : undefined
 
-    // ───── SEND EMAIL ─────
-    const info = await sendWithTimeout(
-      transporter.sendMail({
-        from: FROM,
-        to,
-        subject,
-        text,
-        html,
-      }),
-      12_000
-    )
+    // ───── ENV ─────
+    const apiKey     = requireEnv(ctx, 'BREVO_API_KEY')
+    const fromEmail  = requireEnv(ctx, 'FROM_EMAIL')
+    const senderName = requireEnv(ctx, 'SENDER_NAME')
 
-    // ───── DEBUG OUTPUT (CRITICAL) ─────
-    const result = {
-      ok: true,
-      messageId: info.messageId,
-      accepted: info.accepted,
-      rejected: info.rejected,
-      response: info.response,
+    // ───── SEND ─────
+    const result = await sendBrevoEmail(apiKey, fromEmail, senderName, to, subject, html, text)
+
+    return c.json({ ok: true, messageId: result.messageId }, 200)
+  } catch (err: any) {
+    if (err.message?.includes('[bini-env] Missing required')) {
+      return c.json({ ok: false, error: 'Email service misconfigured' }, 500)
     }
 
-    console.log('EMAIL_RESULT:', result)
-
-    return c.json(result, 200)
-  } catch (err: any) {
-    console.error('EMAIL_ERROR:', err)
-
-    return c.json(
-      {
-        ok: false,
-        error: err?.message || 'Internal server error',
-      },
-      500
-    )
+    console.error('EMAIL_ERROR:', err.message)
+    return c.json({ ok: false, error: err?.message || 'Internal server error' }, 500)
   }
 })
 
 // ─────────────────────────────────────────────
-// GET /api/test-email (HEALTH CHECK)
+// GET /api/email (HEALTH CHECK)
 // ─────────────────────────────────────────────
 app.get('/email', (c) => {
   return c.json({
