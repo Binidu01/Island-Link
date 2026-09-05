@@ -13,13 +13,16 @@ import {
   getDocs,
   deleteDoc,
 } from 'firebase/firestore'
-import L from 'leaflet'
 import { useEffect, useState, useRef } from 'react'
 
 import CustomerNavbar from '../components/customernavbar'
 import { auth, db } from '../lib/firebase'
 
+// ⭐ Import CSS only (this is fine for SSR)
 import 'leaflet/dist/leaflet.css'
+
+// ⭐ Import Leaflet types for TypeScript
+import type { Map, Marker, LatLng, LeafletEvent } from 'leaflet'
 
 interface CartItem {
   id?: string
@@ -52,6 +55,11 @@ interface CardDetails {
   cvv: string
 }
 
+// ⭐ Define Leaflet event types
+interface LeafletMouseEvent extends LeafletEvent {
+  latlng: LatLng
+}
+
 export default function CheckoutPage() {
   const [cart, setCart] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -64,9 +72,11 @@ export default function CheckoutPage() {
   const [mapCenter, setMapCenter] = useState<[number, number]>([6.9271, 79.8612])
   const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null)
 
+  // ⭐ Leaflet refs
+  const [L, setL] = useState<any>(null)
   const mapDivRef = useRef<HTMLDivElement | null>(null)
-  const mapRef = useRef<L.Map | null>(null)
-  const markerRef = useRef<L.Marker | null>(null)
+  const mapRef = useRef<Map | null>(null)
+  const markerRef = useRef<Marker | null>(null)
 
   const [cardDetails, setCardDetails] = useState<CardDetails>({
     cardNumber: '',
@@ -87,6 +97,13 @@ export default function CheckoutPage() {
     longitude: undefined,
   })
 
+  // ⭐ Load Leaflet dynamically on the client
+  useEffect(() => {
+    import('leaflet').then((module) => {
+      setL(module.default)
+    })
+  }, [])
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser)
@@ -95,7 +112,6 @@ export default function CheckoutPage() {
           const userDoc = await getDoc(doc(db, 'users', currentUser.uid))
           if (userDoc.exists()) {
             const userData = userDoc.data()
-            // Set email from user profile if exists, otherwise use Firebase Auth email
             const userEmail = userData.email || currentUser.email || ''
 
             setShippingInfo((prev) => ({
@@ -115,20 +131,18 @@ export default function CheckoutPage() {
               setSelectedLocation([userData.latitude, userData.longitude])
             }
           } else {
-            // No user profile exists, use Firebase Auth data
             setShippingInfo((prev) => ({
               ...prev,
               fullName: currentUser.displayName || '',
-              email: currentUser.email || '', // Firebase Auth email
+              email: currentUser.email || '',
             }))
           }
         } catch (error) {
           console.error('Error loading user profile:', error)
-          // Fallback to Firebase Auth data
           setShippingInfo((prev) => ({
             ...prev,
             fullName: currentUser.displayName || '',
-            email: currentUser.email || '', // Firebase Auth email
+            email: currentUser.email || '',
           }))
         }
 
@@ -211,12 +225,10 @@ export default function CheckoutPage() {
     let formattedValue = value
 
     if (name === 'cardNumber') {
-      // Remove non-digits and format with spaces
       const digits = value.replace(/\D/g, '')
       formattedValue = digits.match(/.{1,4}/g)?.join(' ') || digits
       if (digits.length > 16) return
     } else if (name === 'expiryDate') {
-      // Format as MM/YY
       const digits = value.replace(/\D/g, '')
       if (digits.length >= 2) {
         formattedValue = digits.slice(0, 2) + '/' + digits.slice(2, 4)
@@ -225,21 +237,21 @@ export default function CheckoutPage() {
       }
       if (digits.length > 4) return
     } else if (name === 'cvv') {
-      // Only digits, max 4
       formattedValue = value.replace(/\D/g, '')
       if (formattedValue.length > 4) return
     } else if (name === 'cardName') {
-      // Only letters and spaces
       formattedValue = value.replace(/[^a-zA-Z\s]/g, '').toUpperCase()
     }
 
     setCardDetails((prev) => ({ ...prev, [name]: formattedValue }))
   }
 
+  // ⭐ Map initialization - now uses dynamic L with proper types
   useEffect(() => {
     if (!showMap) return
     if (!mapDivRef.current) return
     if (mapRef.current) return
+    if (!L) return
 
     const initial = L.latLng(mapCenter[0], mapCenter[1])
 
@@ -256,57 +268,56 @@ export default function CheckoutPage() {
 
     markerRef.current = L.marker(initial, { draggable: true }).addTo(map)
 
-    map.on('click', async (e) => {
+    // ⭐ Fix: Add explicit type to the event parameter
+    map.on('click', (e: LeafletMouseEvent) => {
       if (markerRef.current) {
         markerRef.current.setLatLng(e.latlng)
         setSelectedLocation([e.latlng.lat, e.latlng.lng])
 
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`
-          )
-          const data = await response.json()
-
-          if (data.address) {
-            setShippingInfo((prev) => ({
-              ...prev,
-              address: data.display_name || prev.address,
-              city: data.address.city || data.address.town || data.address.village || prev.city,
-              postalCode: data.address.postcode || prev.postalCode,
-              latitude: e.latlng.lat,
-              longitude: e.latlng.lng,
-            }))
-          }
-        } catch (error) {
-          console.error('Error reverse geocoding:', error)
-        }
+        // Reverse geocoding
+        fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.address) {
+              setShippingInfo((prev) => ({
+                ...prev,
+                address: data.display_name || prev.address,
+                city: data.address.city || data.address.town || data.address.village || prev.city,
+                postalCode: data.address.postcode || prev.postalCode,
+                latitude: e.latlng.lat,
+                longitude: e.latlng.lng,
+              }))
+            }
+          })
+          .catch((error) => console.error('Error reverse geocoding:', error))
       }
     })
 
+    // ⭐ Fix: Add explicit type to the event parameter
     if (markerRef.current) {
-      markerRef.current.on('dragend', async (e) => {
-        const pos = e.target.getLatLng()
+      markerRef.current.on('dragend', (e: LeafletEvent) => {
+        const pos = (e.target as Marker).getLatLng()
         setSelectedLocation([pos.lat, pos.lng])
 
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.lat}&lon=${pos.lng}`
-          )
-          const data = await response.json()
-
-          if (data.address) {
-            setShippingInfo((prev) => ({
-              ...prev,
-              address: data.display_name || prev.address,
-              city: data.address.city || data.address.town || data.address.village || prev.city,
-              postalCode: data.address.postcode || prev.postalCode,
-              latitude: pos.lat,
-              longitude: pos.lng,
-            }))
-          }
-        } catch (error) {
-          console.error('Error reverse geocoding:', error)
-        }
+        fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.lat}&lon=${pos.lng}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.address) {
+              setShippingInfo((prev) => ({
+                ...prev,
+                address: data.display_name || prev.address,
+                city: data.address.city || data.address.town || data.address.village || prev.city,
+                postalCode: data.address.postcode || prev.postalCode,
+                latitude: pos.lat,
+                longitude: pos.lng,
+              }))
+            }
+          })
+          .catch((error) => console.error('Error reverse geocoding:', error))
       })
     }
 
@@ -320,17 +331,18 @@ export default function CheckoutPage() {
         markerRef.current = null
       }
     }
-  }, [showMap])
+  }, [showMap, L])
 
+  // ⭐ Pan effect - now uses dynamic L
   useEffect(() => {
     const map = mapRef.current
     const marker = markerRef.current
-    if (!map || !marker) return
+    if (!map || !marker || !L) return
 
     const ll = L.latLng(mapCenter[0], mapCenter[1])
     marker.setLatLng(ll)
     map.panTo(ll)
-  }, [mapCenter])
+  }, [mapCenter, L])
 
   function getCurrentLocation() {
     setShowMap(true)
@@ -373,7 +385,6 @@ export default function CheckoutPage() {
   }
 
   async function processOnlinePayment() {
-    // Validate card details
     if (
       !cardDetails.cardNumber ||
       !cardDetails.cardName ||
@@ -412,7 +423,6 @@ export default function CheckoutPage() {
 
   async function completeOrder(paymentType: string) {
     try {
-      // Validate email is provided
       if (!shippingInfo.email || shippingInfo.email.trim() === '') {
         alert('Please provide your email address')
         setProcessing(false)
@@ -420,13 +430,12 @@ export default function CheckoutPage() {
         return
       }
 
-      // Update user profile
       const userRef = doc(db, 'users', user.uid)
       const userDoc = await getDoc(userRef)
 
       const profileUpdateData: any = {
         fullName: shippingInfo.fullName,
-        email: shippingInfo.email, // Use email from form
+        email: shippingInfo.email,
         phone: shippingInfo.phone,
         address: shippingInfo.address,
         city: shippingInfo.city,
@@ -448,10 +457,9 @@ export default function CheckoutPage() {
         })
       }
 
-      // Create order - Use email from shipping form
       const orderData: any = {
         userId: user.uid,
-        userEmail: shippingInfo.email, // Use email from shipping form
+        userEmail: shippingInfo.email,
         items: cart.map((item) => ({
           productId: item.productId,
           name: item.name,
@@ -465,22 +473,19 @@ export default function CheckoutPage() {
         subtotal,
         shipping,
         total,
-        status: 'pending', // Always "pending" for all orders
-        pay: paymentType === 'online' ? 'paid' : 'pending', // Separate pay field
+        status: 'pending',
+        pay: paymentType === 'online' ? 'paid' : 'pending',
         createdAt: serverTimestamp(),
       }
 
       const docRef = await addDoc(collection(db, 'orders'), orderData)
 
-      // Send order confirmation email
       try {
         await sendOrderConfirmationEmail(docRef.id, paymentType)
       } catch (emailError) {
         console.error('Failed to send email, but order was placed:', emailError)
-        // Don't block the order process if email fails
       }
 
-      // Clear cart
       const urlParams = new URLSearchParams(window.location.search)
       const isBuyNow = urlParams.get('buynow') === 'true'
 
@@ -497,7 +502,6 @@ export default function CheckoutPage() {
 
       window.dispatchEvent(new Event('cartUpdated'))
 
-      // Redirect to success page
       window.location.href = `/order-success?orderId=${docRef.id}`
     } catch (error) {
       console.error('Error completing order:', error)
@@ -507,46 +511,32 @@ export default function CheckoutPage() {
     }
   }
 
-  // Convert base64 WebP to PNG for email compatibility
+  // ⭐ Convert WebP to PNG (unchanged)
   async function convertWebpToPng(base64WebP: string): Promise<string> {
     return new Promise((resolve, reject) => {
       try {
-        // Create an image element
         const img = new Image()
-
         img.onload = () => {
           try {
-            // Create canvas
             const canvas = document.createElement('canvas')
             canvas.width = img.width
             canvas.height = img.height
-
             const ctx = canvas.getContext('2d')
             if (!ctx) {
               reject(new Error('Could not get canvas context'))
               return
             }
-
-            // Draw image to canvas
             ctx.drawImage(img, 0, 0)
-
-            // Convert to PNG data URL
             const pngDataUrl = canvas.toDataURL('image/png', 1.0)
-
-            // Clean up
             canvas.remove()
-
             resolve(pngDataUrl)
           } catch (error) {
             reject(error)
           }
         }
-
         img.onerror = () => {
           reject(new Error('Failed to load image'))
         }
-
-        // Set source
         img.src = base64WebP
       } catch (error) {
         reject(error)
@@ -556,7 +546,6 @@ export default function CheckoutPage() {
 
   async function sendOrderConfirmationEmail(orderId: string, paymentType: string) {
     try {
-      // Fetch the complete order data from Firestore
       const orderRef = doc(db, 'orders', orderId)
       const orderSnap = await getDoc(orderRef)
 
@@ -565,9 +554,6 @@ export default function CheckoutPage() {
       }
 
       const orderData = orderSnap.data()
-      console.log('Order data from Firestore:', orderData)
-
-      // Use the order data from Firestore
       const orderItems = orderData.items || []
       const orderSubtotal = orderData.subtotal || 0
       const orderShipping = orderData.shipping || 0
@@ -575,38 +561,22 @@ export default function CheckoutPage() {
       const userEmail = orderData.userEmail || shippingInfo.email
       const shippingInfoFromDB = orderData.shippingInfo || shippingInfo
 
-      console.log('Order items:', orderItems)
-
-      // Fetch product SKUs for each item
       const itemsWithSKU = await Promise.all(
         orderItems.map(async (item: any) => {
           try {
-            // Fetch product details to get SKU
             const productRef = doc(db, 'products', item.productId)
             const productSnap = await getDoc(productRef)
-
             if (productSnap.exists()) {
               const productData = productSnap.data()
-              return {
-                ...item,
-                sku: productData.sku || 'N/A',
-              }
+              return { ...item, sku: productData.sku || 'N/A' }
             }
-            return {
-              ...item,
-              sku: 'N/A',
-            }
+            return { ...item, sku: 'N/A' }
           } catch (error) {
             console.error(`Error fetching product ${item.productId}:`, error)
-            return {
-              ...item,
-              sku: item.sku || 'N/A',
-            }
+            return { ...item, sku: item.sku || 'N/A' }
           }
         })
       )
-
-      console.log('Items with SKU:', itemsWithSKU)
 
       const paymentStatusText =
         paymentType === 'online'
@@ -639,7 +609,6 @@ export default function CheckoutPage() {
         </div>
       `
 
-      // Generate order items HTML WITHOUT images
       const orderItemsHtml = itemsWithSKU
         .map((item: any) => {
           const itemName = item.name || 'Product'
@@ -693,20 +662,15 @@ export default function CheckoutPage() {
       </head>
       <body style="margin: 0; padding: 0; background-color: #f3f4f6;">
         <div class="container">
-          <!-- Header -->
           <div class="header">
             <h1>🎉 Order Placed Successfully!</h1>
             <p>Thank you for shopping with IslandLink</p>
           </div>
-          
-          <!-- Content -->
           <div class="content">
             <p style="font-size: 16px; color: #4b5563;">Dear <strong>${shippingInfoFromDB.fullName}</strong>,</p>
             <p style="font-size: 16px; color: #4b5563;">
               Thank you for placing your order with IslandLink! We have received your order and it is currently being processed. Our team is checking product availability and stock levels. You will receive another confirmation email once your order has been verified and is ready for shipment.
             </p>
-            
-            <!-- Important Note -->
             <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 15px 0; border-radius: 6px;">
               <p style="margin: 0; color: #92400e; font-size: 14px;">
                 <strong>📋 Important:</strong> Your order is currently in <strong>"Pending Verification"</strong> status. We are:
@@ -720,24 +684,16 @@ export default function CheckoutPage() {
                 Once verified, your order status will change to "Processing" and you'll receive another update.
               </p>
             </div>
-            
-            <!-- Order ID -->
             <div class="order-id">
               <strong>Order ID: #${orderId}</strong>
             </div>
-            
-            <!-- Payment Information -->
             ${transactionInfo}
-            
-            <!-- Order Items -->
             <div class="section">
               <div class="section-title">📦 Order Items (${itemsWithSKU.length} items)</div>
               <table style="width: 100%; border-collapse: collapse;" cellpadding="0" cellspacing="0">
                 ${orderItemsHtml}
               </table>
             </div>
-            
-            <!-- Order Summary -->
             <div class="section">
               <div class="section-title">💰 Order Summary</div>
               <table class="summary-table" cellpadding="0" cellspacing="0">
@@ -757,8 +713,6 @@ export default function CheckoutPage() {
                 </tr>
               </table>
             </div>
-            
-            <!-- Delivery Information -->
             <div class="section">
               <div class="section-title">🚚 Delivery Information</div>
               <div style="background: #f9fafb; padding: 15px; border-radius: 8px;">
@@ -774,8 +728,6 @@ export default function CheckoutPage() {
                 ⏱️ <strong>Estimated Delivery:</strong> 3-5 business days (after verification)
               </p>
             </div>
-            
-            <!-- Next Steps -->
             <div class="section">
               <div class="section-title">📝 What Happens Next?</div>
               <div style="background: #f0f9ff; padding: 15px; border-radius: 8px;">
@@ -809,15 +761,11 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </div>
-            
-            <!-- Track Order Button -->
             <div style="text-align: center; margin: 30px 0;">
               <a href="https://your-domain.com/orders/${orderId}" class="button" style="color: white; text-decoration: none;">
                 Track Your Order Status
               </a>
             </div>
-            
-            <!-- Support Info -->
             <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 6px; margin-top: 30px;">
               <p style="margin: 0; color: #92400e; font-size: 14px;">
                 <strong>Need Help?</strong> If you have any questions about your order, please contact our support team at 
@@ -828,8 +776,6 @@ export default function CheckoutPage() {
               </p>
             </div>
           </div>
-          
-          <!-- Footer -->
           <div class="footer">
             <p style="margin: 0 0 10px 0; font-size: 16px; color: #ffffff;">
               <strong>IslandLink Smart Distribution</strong>
@@ -850,7 +796,6 @@ export default function CheckoutPage() {
             </p>
           </div>
         </div>
-      </body>
       </html>
     `
 
@@ -959,26 +904,22 @@ Order Modification: If you need to modify or cancel your order, please contact u
       return
     }
 
-    // Validate email
     if (!shippingInfo.email || shippingInfo.email.trim() === '') {
       alert('Please provide your email address')
       return
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(shippingInfo.email)) {
       alert('Please enter a valid email address')
       return
     }
 
-    // If online payment selected, show payment modal
     if (paymentMethod === 'online') {
       setShowPaymentModal(true)
       return
     }
 
-    // Process COD order
     setProcessing(true)
     await completeOrder('cod')
   }
@@ -1024,7 +965,6 @@ Order Modification: If you need to modify or cancel your order, please contact u
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-9999 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
             <div className="bg-linear-to-r from-blue-600 to-cyan-500 px-6 py-4 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -1066,9 +1006,7 @@ Order Modification: If you need to modify or cancel your order, please contact u
               </div>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6">
-              {/* Amount Display */}
               <div className="bg-linear-to-br from-gray-50 to-gray-100 rounded-xl p-4 mb-6">
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-1">Amount to Pay</p>
@@ -1080,9 +1018,7 @@ Order Modification: If you need to modify or cancel your order, please contact u
                 </div>
               </div>
 
-              {/* Card Form */}
               <form className="space-y-4">
-                {/* Card Number */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Card Number <span className="text-red-500">*</span>
@@ -1109,7 +1045,6 @@ Order Modification: If you need to modify or cancel your order, please contact u
                   </div>
                 </div>
 
-                {/* Card Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Cardholder Name <span className="text-red-500">*</span>
@@ -1125,7 +1060,6 @@ Order Modification: If you need to modify or cancel your order, please contact u
                   />
                 </div>
 
-                {/* Expiry and CVV */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1159,7 +1093,6 @@ Order Modification: If you need to modify or cancel your order, please contact u
                   </div>
                 </div>
 
-                {/* Security Features */}
                 <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                   <div className="flex items-start gap-3">
                     <svg
@@ -1185,7 +1118,6 @@ Order Modification: If you need to modify or cancel your order, please contact u
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex gap-3 mt-6">
                   <button
                     type="button"
@@ -1227,7 +1159,6 @@ Order Modification: If you need to modify or cancel your order, please contact u
                   </button>
                 </div>
 
-                {/* Accepted Cards */}
                 <div className="text-center pt-4 border-t">
                   <p className="text-xs text-gray-500 mb-2">We accept</p>
                   <div className="flex items-center justify-center gap-3">
@@ -1285,9 +1216,7 @@ Order Modification: If you need to modify or cancel your order, please contact u
         ) : (
           <form onSubmit={handlePlaceOrder}>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Shipping Information */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Contact Information */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Contact Information</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1341,7 +1270,6 @@ Order Modification: If you need to modify or cancel your order, please contact u
                   </div>
                 </div>
 
-                {/* Shipping Address */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Shipping Address</h2>
@@ -1476,7 +1404,6 @@ Order Modification: If you need to modify or cancel your order, please contact u
                   </div>
                 </div>
 
-                {/* Payment Method */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Method</h2>
                   <div className="space-y-3">
@@ -1524,7 +1451,6 @@ Order Modification: If you need to modify or cancel your order, please contact u
                 </div>
               </div>
 
-              {/* Order Summary */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>

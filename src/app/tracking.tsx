@@ -1,20 +1,14 @@
 'use client'
 
 import { doc, onSnapshot, getDoc } from 'firebase/firestore'
-import L from 'leaflet'
 import { useEffect, useState, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 
 import 'leaflet/dist/leaflet.css'
 import { db } from '../lib/firebase'
 
-// Fix for Leaflet default icons
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/leaflet/images/marker-icon-2x.png',
-  iconUrl: '/leaflet/images/marker-icon.png',
-  shadowUrl: '/leaflet/images/marker-shadow.png',
-})
+// ⭐ Import Leaflet types
+import type { Map as LeafletMap, Marker, LatLng, LeafletEvent, Icon } from 'leaflet'
 
 interface Order {
   id: string
@@ -140,9 +134,7 @@ const Timeline = ({ order }: { order: Order }) => {
       {/* Progress bar */}
       <div className="absolute left-0 right-0 top-4 h-0.5 bg-gray-200 -translate-y-1/2">
         <div
-          className={`h-full bg-green-500 transition-all duration-500 w-[${
-            (currentIndex / (statuses.length - 1)) * 100
-          }%]`}
+          className={`h-full bg-green-500 transition-all duration-500 w-[${(currentIndex / (statuses.length - 1)) * 100}%]`}
         />
       </div>
 
@@ -155,9 +147,7 @@ const Timeline = ({ order }: { order: Order }) => {
           return (
             <div key={status.key} className="flex flex-col items-center relative">
               <div
-                className={`h-8 w-8 rounded-full border-2 flex items-center justify-center z-10 ${
-                  isCompleted ? 'bg-green-500 border-green-500' : 'bg-white border-gray-300'
-                }`}
+                className={`h-8 w-8 rounded-full border-2 flex items-center justify-center z-10 ${isCompleted ? 'bg-green-500 border-green-500' : 'bg-white border-gray-300'}`}
               >
                 {isCompleted ? (
                   <svg
@@ -271,6 +261,7 @@ const getStraightLineRoute = (
   }
 }
 
+// ⭐ DeliveryMap Component with dynamic Leaflet
 const DeliveryMap = ({
   order,
   driverLocation,
@@ -279,11 +270,19 @@ const DeliveryMap = ({
   driverLocation: [number, number] | null
 }) => {
   const mapRef = useRef<HTMLDivElement>(null)
-  const mapInstanceRef = useRef<L.Map | null>(null)
+  const mapInstanceRef = useRef<LeafletMap | null>(null)
   const markersRef = useRef<any[]>([])
-  const routeLineRef = useRef<L.Polyline | null>(null)
+  const routeLineRef = useRef<any>(null)
+  const [L, setL] = useState<any>(null)
   const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null)
   const [loadingRoute, setLoadingRoute] = useState(false)
+
+  // ⭐ Load Leaflet dynamically on the client
+  useEffect(() => {
+    import('leaflet').then((module) => {
+      setL(module.default)
+    })
+  }, [])
 
   // Load route when driver location or order changes
   useEffect(() => {
@@ -333,7 +332,7 @@ const DeliveryMap = ({
   }
 
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!mapRef.current || !L) return
 
     // Initialize map
     const map = L.map(mapRef.current).setView([7.8731, 80.7718], 13)
@@ -351,11 +350,11 @@ const DeliveryMap = ({
       markersRef.current = []
       routeLineRef.current = null
     }
-  }, [])
+  }, [L])
 
   useEffect(() => {
     const map = mapInstanceRef.current
-    if (!map) return
+    if (!map || !L) return
 
     // Clear existing markers and route
     markersRef.current.forEach((marker) => marker.remove())
@@ -496,7 +495,7 @@ const DeliveryMap = ({
         markersRef.current.push(accuracyCircle)
       }
     }
-  }, [order, driverLocation, routeInfo])
+  }, [order, driverLocation, routeInfo, L])
 
   return (
     <div className="relative">
@@ -515,13 +514,9 @@ const DeliveryMap = ({
       {routeInfo && (
         <div className="absolute bottom-4 left-4 bg-white px-3 py-2 rounded-lg shadow-md border border-gray-200">
           <div className="text-sm text-gray-600">
-            <span className="font-semibold text-gray-900">
-              {(routeInfo.distance / 1000).toFixed(1)} km
-            </span>
+            <span className="font-semibold text-gray-900">{(routeInfo.distance / 1000).toFixed(1)} km</span>
             <span className="mx-2">•</span>
-            <span className="font-semibold text-gray-900">
-              {Math.round(routeInfo.duration / 60)} min
-            </span>
+            <span className="font-semibold text-gray-900">{Math.round(routeInfo.duration / 60)} min</span>
           </div>
         </div>
       )}
@@ -812,15 +807,14 @@ const OrderStatusUpdates = ({ order }: { order: Order }) => {
                 className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0"
               >
                 <div
-                  className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                    update.status === 'delivered'
+                  className={`h-10 w-10 rounded-full flex items-center justify-center ${update.status === 'delivered'
                       ? 'bg-green-100 text-green-600'
                       : update.status === 'rejected'
                         ? 'bg-red-100 text-red-600'
                         : update.status.includes('delivery')
                           ? 'bg-orange-100 text-orange-600'
                           : 'bg-blue-100 text-blue-600'
-                  }`}
+                    }`}
                 >
                   {update.status === 'delivered' ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1209,11 +1203,10 @@ export default function OrderTrackingPage() {
                 <div className="pt-2 border-t border-gray-200">
                   <p className="text-sm text-gray-600">Payment Status</p>
                   <span
-                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      order.pay === 'paid'
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${order.pay === 'paid'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-yellow-100 text-yellow-800'
-                    }`}
+                      }`}
                   >
                     {order.pay === 'paid' ? 'PAID' : 'PENDING'}
                   </span>

@@ -1,6 +1,7 @@
+'use client'
+
 import { onAuthStateChanged, User } from 'firebase/auth'
 import { collection, onSnapshot, doc, getDoc, updateDoc, addDoc } from 'firebase/firestore'
-import L from 'leaflet'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
@@ -9,13 +10,9 @@ import LogisticsNavbar from '../components/LogisticsNavbar'
 import 'leaflet/dist/leaflet.css'
 import { db, auth } from '../lib/firebase'
 
-// Fix for Leaflet default icons
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/leaflet/images/marker-icon-2x.png',
-  iconUrl: '/leaflet/images/marker-icon.png',
-  shadowUrl: '/leaflet/images/marker-shadow.png',
-})
+// ⭐ Import Leaflet types
+import type { Map as LeafletMap, Marker, LatLng, LeafletEvent, Icon } from 'leaflet'
+import L from 'leaflet'
 
 interface Order {
   id: string
@@ -108,7 +105,7 @@ declare global {
   }
 }
 
-// Helper Components
+// ⭐ Helper Components (unchanged)
 const SuccessModal = ({ isOpen, onClose, title, message }: any) => {
   if (!isOpen) return null
   return (
@@ -439,6 +436,7 @@ const MapLoading = () => (
   </div>
 )
 
+// ⭐ SimpleMap Component with dynamic Leaflet
 const SimpleMap = (props: any) => {
   const {
     mapCenter,
@@ -456,11 +454,20 @@ const SimpleMap = (props: any) => {
     isDelivering,
     vehiclePosition,
   } = props
+  
   const mapRef = useRef<HTMLDivElement>(null)
-  const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
+  const [L, setL] = useState<any>(null)
+  const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null)
+
+  // ⭐ Load Leaflet dynamically on the client
+  useEffect(() => {
+    import('leaflet').then((module) => {
+      setL(module.default)
+    })
+  }, [])
 
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!L || !mapRef.current) return
 
     const style = document.createElement('style')
     style.textContent = `
@@ -485,11 +492,11 @@ const SimpleMap = (props: any) => {
       map.remove()
       document.head.removeChild(style)
     }
-  }, [])
+  }, [L])
 
   useEffect(() => {
-    if (!mapInstance) return
-    mapInstance.eachLayer((layer) => {
+    if (!mapInstance || !L) return
+    mapInstance.eachLayer((layer: any) => {
       if (!(layer instanceof L.TileLayer)) mapInstance.removeLayer(layer)
     })
 
@@ -607,10 +614,10 @@ const SimpleMap = (props: any) => {
       if (allPoints.length > 0)
         mapInstance.fitBounds(L.latLngBounds(allPoints), { padding: [50, 50], maxZoom: 15 })
     }
-  }, [mapInstance, optimizedRoute, routePoints, orders, selectedOrders, userLocation])
+  }, [mapInstance, L, optimizedRoute, routePoints, orders, selectedOrders, userLocation])
 
   useEffect(() => {
-    if (!mapInstance || !vehiclePosition) return
+    if (!mapInstance || !L || !vehiclePosition) return
     if (window.vehicleMarker) mapInstance.removeLayer(window.vehicleMarker)
 
     const vehicleIcon = L.divIcon({
@@ -632,7 +639,7 @@ const SimpleMap = (props: any) => {
         delete window.vehicleMarker
       }
     }
-  }, [mapInstance, vehiclePosition, isDelivering])
+  }, [mapInstance, L, vehiclePosition, isDelivering])
 
   useEffect(() => {
     const handleSelectOrder = (event: CustomEvent) => toggleOrderSelection(event.detail)
@@ -1715,11 +1722,7 @@ Need help? Contact us at support@islandlink.com or call +94 77 123 4567
         setSuccessModal({
           isOpen: true,
           title: `Order ${status === 'delivered' ? 'Delivered' : 'Rejected'}`,
-          message: `Order has been marked as ${status} successfully.${
-            status === 'delivered' && currentPayStatus === 'pending'
-              ? ' Payment status changed to Paid.'
-              : ''
-          }${remainingDeliveries.length === 0 ? ' All deliveries complete!' : ''}`,
+          message: `Order has been marked as ${status} successfully.${status === 'delivered' && currentPayStatus === 'pending' ? ' Payment status changed to Paid.' : ''}${remainingDeliveries.length === 0 ? ' All deliveries complete!' : ''}`,
         })
         saveAuditLog(
           status === 'delivered' ? 'Mark Order as Delivered' : 'Reject Order',
