@@ -14,6 +14,7 @@
     "check": "oxlint src && oxfmt src && tsc --noEmit"
   },
   "dependencies": {
+    "avatar64": "^1.1.0",
     "bini-overlay": "latest",
     "bini-router": "latest",
     "bini-server": "latest",
