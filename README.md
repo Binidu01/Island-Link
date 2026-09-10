@@ -1,427 +1,188 @@
+<div align="center">
+
 # Island-Link
 
-A **Bini.js** application — build full-stack React applications for **web, desktop, and mobile** using a single unified development experience.
+**A full-stack e-commerce and supply-chain management platform built for Sri Lanka's regional distribution network.**
 
-Powered by **Bini.js**, **Vite**, **Hono**, and **Tauri**.
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
+
+[![Stars](https://img.shields.io/github/stars/Binidu01/Island-Link?style=for-the-badge&logo=github)](https://github.com/Binidu01/Island-Link/stargazers)
+[![Forks](https://img.shields.io/github/forks/Binidu01/Island-Link?style=for-the-badge&logo=github)](https://github.com/Binidu01/Island-Link/network/members)
+[![Issues](https://img.shields.io/github/issues/Binidu01/Island-Link?style=for-the-badge&logo=github)](https://github.com/Binidu01/Island-Link/issues)
+[![License](https://img.shields.io/github/license/Binidu01/Island-Link?style=for-the-badge)](LICENSE)
+
+</div>
 
 ---
 
-# Web
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Variables](#environment-variables)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+- [Acknowledgements](#acknowledgements)
+
+---
+
+## Overview
+
+Island-Link is a comprehensive platform designed to streamline order management, logistics, and customer engagement across Sri Lanka's regional distribution network. It supports multiple user roles — from administrators and warehouse staff to delivery teams and end customers — with real-time tracking, automated notifications, and a fully responsive interface.
+
+---
 
 ## Features
 
-- File-based routing, nested layouts, per-route metadata, and automatic code splitting powered by **bini-router**.
-- API routes powered by **Hono**:
-  - Plain function handlers
-  - Full Hono applications
-  - Located inside `src/app/api/`
-- API execution through:
-  - Vite development middleware
-  - bini-server in production
-  - Edge runtimes when deployed
-- Zero-dependency production server (**bini-server**) with:
-  - ETag support
-  - 304 responses
-  - Graceful shutdown
-  - Automatic port fallback
-- Deploy anywhere:
-  - Netlify Edge Functions
-  - Vercel Edge Runtime
-  - Cloudflare Workers
-  - Node.js
-  - Deno
-- Development overlay with:
-  - Shiki-powered error highlighting
-  - Automatic import support
-  - GitHub Codespaces compatibility
-- Static Site Generation (SSG) powered by **bini-ssg**:
-  - Pre-renders routes to static HTML at build time via the `render()` function exported from `main.tsx`
-  - Uses React 19's `renderToPipeableStream` under the hood — no extra fallback needed
-  - Client hydration handled automatically via `hydrateRoot`
-
-## Commands
-
-| Command | Description |
+| Category | Capability |
 |---|---|
-| `pnpm run dev` | Start the Vite development server with HMR |
-| `pnpm run build` | Type-check and build the production application |
-| `pnpm start` | Serve production output using bini-server |
-| `pnpm run preview` | Preview the production build |
-| `pnpm run deploy` | Deploy the application to your chosen platform |
-
-`start` is available only for web-target projects.
-
-Desktop and mobile targets ship as native applications instead.
-
-## Requirements
-
-- Node.js >= 20.19.0
-
-No native SDKs, platform toolchains, or signing setup required.
+| **User Roles** | Multi-role dashboards for Admin, HO Manager, RDC Staff, Logistics Team, and Customer |
+| **Product Management** | Add, edit, and delete products with WebP image uploads |
+| **Order Lifecycle** | Full status pipeline: Place → Confirm → Process → Out for Delivery → Delivered / Rejected |
+| **Real-Time Tracking** | Live vehicle location on Leaflet maps with OSRM route optimisation |
+| **Email Notifications** | Automatic order status updates via Brevo REST API (edge-native, no SMTP required) |
+| **Audit Logging** | Every admin and staff action recorded for accountability |
+| **Cart & Wishlist** | Firebase-powered persistent cart and wishlist across sessions |
+| **Reviews & Q&A** | Star ratings and product Q&A from customers |
+| **Route Planner** | Logistics team can optimise and navigate delivery routes in real time |
+| **Responsive UI** | Tailwind CSS v4 layout that adapts to all screen sizes |
 
 ---
 
-# Windows Desktop
+## Tech Stack
 
-## Features
-
-- Builds a native Windows desktop application using **Tauri** and **WebView2**.
-- Small application size without bundling a complete browser engine.
-- Native APIs automatically configured through **bini-native**:
-  - Filesystem
-  - Clipboard
-  - Notifications
-  - Dialogs
-  - OS information
-- External URLs automatically open in the user's default browser.
-- Supports Windows application signing through Authenticode.
-
-## Commands
-
-| Command | Description |
+| Layer | Technology |
 |---|---|
-| `pnpm run tauri:dev` | Start the application in development mode |
-| `pnpm run tauri:build` | Build a distributable Windows application |
-| `pnpm run tauri:icon` | Generate application icons from `public/logo.png` |
-| `pnpm run deploy` | Deploy the Windows application (build + sign + distribute) |
+| Framework | [Bini.js](https://github.com/Binidu01) — Zero-config React framework |
+| Bundler | Vite 8 (Rolldown-powered) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Database & Auth | Firebase (Firestore + Authentication) |
+| Email | Brevo REST API — edge-native transactional email via `fetch` |
+| Maps & Routing | Leaflet + OpenStreetMap + OSRM |
+| API Layer | Hono (bundled with Bini.js) |
+| Environment | bini-env — zero-config, request-scoped env vars |
+| Linting & Formatting | Oxlint & Oxfmt |
+| Profile Images | avatar64 — Base64-encoded images stored in Firestore |
 
-## Requirements
+---
 
-- Microsoft C++ Build Tools
+## Getting Started
 
-Install:
+### Prerequisites
 
-```
-Desktop development with C++
-```
+- [Node.js](https://nodejs.org/) v18 or higher
+- [pnpm](https://pnpm.io/) (recommended) or npm
 
-- Microsoft Edge WebView2 Runtime
-
-Verify installation:
+### Installation
 
 ```bash
-cl
+# Clone the repository
+git clone https://github.com/Binidu01/Island-Link.git
+
+# Navigate to the project directory
+cd Island-Link
+
+# Install dependencies
+pnpm install
+
+# Start the development server
+pnpm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Environment Variables
+
+Create a `.env` file in the project root and populate the following values:
+
+```env
+# ── Firebase ──────────────────────────────────────────────────
+BINI_FIREBASE_API_KEY=
+BINI_FIREBASE_AUTH_DOMAIN=
+BINI_FIREBASE_PROJECT_ID=
+BINI_FIREBASE_STORAGE_BUCKET=
+BINI_FIREBASE_MESSAGING_SENDER_ID=
+BINI_FIREBASE_APP_ID=
+BINI_FIREBASE_MEASUREMENT_ID=
+
+# ── Email (Brevo REST API) ─────────────────────────────────────
+BREVO_API_KEY=
+FROM_EMAIL=
+SENDER_NAME=
 ```
 
 ---
 
-# macOS Desktop
-
-## Features
-
-- Builds a native macOS application using **Tauri** and **WKWebView**.
-- Native API integration automatically configured by **bini-native**.
-- Supports:
-  - Filesystem access
-  - Clipboard access
-  - Notifications
-  - Dialogs
-- External URLs open in the user's default browser.
-- Supports:
-  - Ad-hoc signing for local testing
-  - Developer ID signing
-  - Application notarization
-
-## Commands
-
-| Command | Description |
-|---|---|
-| `pnpm run tauri:dev` | Start the application in development mode |
-| `pnpm run tauri:build` | Build a distributable macOS application |
-| `pnpm run tauri:icon` | Generate application icons from `public/logo.png` |
-| `pnpm run deploy` | Deploy the macOS application (build + sign + notarize + distribute) |
-
-## Requirements
-
-- macOS
-- Xcode Command Line Tools
+## Usage
 
 ```bash
-xcode-select --install
+# Start development server with hot reload
+pnpm run dev
+
+# Build for production
+pnpm run build
+
+# Start production server
+pnpm start
+
+# Lint, format, and type-check
+pnpm run check
 ```
 
-- Homebrew
-
-- Tauri dependencies:
-
-```bash
-brew install gtk+3 webkit2gtk pkg-config
-```
-
-- Xcode (required for iOS development)
+For detailed documentation, refer to the [project wiki](https://github.com/Binidu01/Island-Link/wiki).
 
 ---
 
-# Linux Desktop
+## Contributing
 
-## Features
+Contributions are welcome and greatly appreciated. To get started:
 
-- Builds native Linux applications using **Tauri** and **WebKitGTK**.
-- Automatic native API integration through **bini-native**.
-- Supports:
-  - Filesystem
-  - Clipboard
-  - Notifications
-  - Dialogs
-- External links open using the system browser.
-- Supports AppImage distribution.
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes: `git commit -m 'Add your-feature-name'`
+4. Push to the branch: `git push origin feature/your-feature-name`
+5. Open a Pull Request
 
-## Commands
-
-| Command | Description |
-|---|---|
-| `pnpm run tauri:dev` | Start the application in development mode |
-| `pnpm run tauri:build` | Build Linux binaries/AppImage |
-| `pnpm run tauri:icon` | Generate application icons from `public/logo.png` |
-| `pnpm run deploy` | Deploy the Linux application (build + package + distribute) |
-
-## Requirements
-
-### Debian / Ubuntu
-
-```bash
-sudo apt update
-
-sudo apt install -y \
-libwebkit2gtk-4.0-dev \
-build-essential \
-libssl-dev \
-libgtk-3-dev \
-libayatana-appindicator3-dev \
-librsvg2-dev \
-libxdo-dev \
-pkg-config
-```
-
-### Fedora
-
-```bash
-sudo dnf groupinstall "C Development Tools and Libraries"
-
-sudo dnf install \
-webkit2gtk4.0-devel \
-openssl-devel \
-gtk3-devel \
-libappindicator-gtk3-devel \
-librsvg2-devel \
-libxdo-devel \
-pkg-config
-```
-
-### Arch
-
-```bash
-sudo pacman -S \
-webkit2gtk \
-base-devel \
-openssl \
-gtk3 \
-libappindicator-gtk3 \
-librsvg \
-libxdo \
-pkg-config
-```
+Please ensure your code passes linting and type-checks (`pnpm run check`) before submitting.
 
 ---
 
-# Android
+## License
 
-## Features
-
-- Builds a real native Android application using Tauri's Android backend.
-- Not a browser wrapper.
-- Native capabilities automatically wired by **bini-native**:
-  - Camera
-  - Filesystem
-  - Notifications
-  - Geolocation
-  - Device APIs
-- Android configuration available through:
-
-```
-src-tauri/gen/android
-```
-
-- Supports release signing with:
-  - Android keystore
-  - keystore.properties
-
-## Commands
-
-| Command | Description |
-|---|---|
-| `pnpm run android` | Run on a connected Android emulator or device |
-| `pnpm run android:build` | Build a release APK/AAB |
-| `pnpm run deploy` | Deploy the Android app (build + sign + distribute to stores) |
-| `pnpm run tauri -- android dev` | Manual equivalent of `pnpm run android` |
-| `pnpm run tauri -- android build` | Manual equivalent of `pnpm run android:build` |
-
-## Requirements
-
-- Java JDK 17
-- Android Studio
-- Android SDK
-- Android Build Tools
-- Android NDK
-
-Environment variables:
-
-```
-JAVA_HOME
-ANDROID_HOME
-```
-
-Rust targets:
-
-```bash
-rustup target add aarch64-linux-android
-rustup target add armv7-linux-androideabi
-rustup target add i686-linux-android
-rustup target add x86_64-linux-android
-```
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-# iOS
+## Contact
 
-## Features
+**Binidu Ranasinghe** — [@Binidu01](https://github.com/Binidu01)
 
-- Builds a native iOS application using Tauri's iOS backend.
-- Uses Apple's WKWebView runtime.
-- Native plugin integration automatically managed by **bini-native**.
-- Supports:
-  - Automatic Xcode signing
-  - Manual certificates
-  - CI signing workflows
-
-iOS builds require macOS.
-
-Windows and Linux cannot generate iOS applications.
-
-## Commands
-
-| Command | Description |
-|---|---|
-| `pnpm run ios` | Run on the iOS Simulator or a connected device |
-| `pnpm run ios:build` | Build the iOS application |
-| `pnpm run deploy` | Deploy the iOS app (build + sign + distribute to TestFlight/App Store) |
-| `pnpm run tauri -- ios dev` | Manual equivalent of `pnpm run ios` |
-| `pnpm run tauri -- ios build` | Manual equivalent of `pnpm run ios:build` |
-
-## Requirements
-
-(macOS only)
-
-- Xcode
-- Xcode Command Line Tools
-
-```bash
-xcode-select --install
-```
-
-- CocoaPods
-
-```bash
-sudo gem install cocoapods
-```
-
-Rust targets:
-
-```bash
-rustup target add aarch64-apple-ios
-rustup target add x86_64-apple-ios
-rustup target add aarch64-apple-ios-sim
-```
+Project Link: [https://github.com/Binidu01/Island-Link](https://github.com/Binidu01/Island-Link)
 
 ---
 
-# Native Integration
+## Acknowledgements
 
-## bini-native
-
-bini-native automatically manages Tauri native configuration during development and builds.
-
-Handled automatically:
-
-- Tauri plugin registration
-- Rust dependencies
-- Capability permissions
-- Android configuration
-- iOS configuration
-- macOS configuration
-
-No manual native wiring required.
+- All contributors who have helped this project grow
+- The open-source community for the incredible tools that power this platform
+- **Academic Supervision:** [Nimesha Rajakaruna](https://github.com/nimesharajakaruna1-beep) — guidance provided as part of undergraduate coursework
 
 ---
 
-# Code Signing
+<div align="center">
 
-Signing configuration is stored in git-ignored files.
+Made with ❤️ by [Binidu01](https://github.com/Binidu01)
 
-Desktop signing:
+⭐ If you find this project useful, please consider giving it a star!
 
-```
-.env.signing
-```
-
-Supported platforms:
-
-- Windows
-- macOS
-- Linux
-
-Android signing:
-
-```
-src-tauri/gen/android/keystore.properties
-```
-
----
-
-# Deployment
-
-The `deploy` command handles the entire release process for your target platform:
-
-| Platform | Deploy Command | What it does |
-|---|---|---|
-| Web | `pnpm run deploy` | Builds and deploys to your configured hosting platform (Vercel, Netlify, Cloudflare, etc.) |
-| Windows | `pnpm run deploy` | Builds, signs with Authenticode, and prepares the Windows installer |
-| macOS | `pnpm run deploy` | Builds, signs with Developer ID, notarizes with Apple, and prepares the DMG |
-| Linux | `pnpm run deploy` | Builds the AppImage/DEB/RPM and prepares for distribution |
-| Android | `pnpm run deploy` | Builds a signed APK/AAB and prepares for Play Store distribution |
-| iOS | `pnpm run deploy` | Builds, signs, and prepares for TestFlight/App Store distribution |
-
-Configuration for deployment is managed through:
-- `bini-deploy` package
-- Environment variables in `.env`
-- Platform-specific settings in `tauri.conf.json`
-
----
-
-# Built With
-
-The Bini.js ecosystem:
-
-- **Vite** — modern build pipeline with Rolldown-powered builds
-- **Hono** — lightweight API framework
-- **bini-router** — filesystem routing and API middleware
-- **bini-server** — zero-dependency production server
-- **bini-native** — automatic Tauri integration
-- **bini-env** — environment configuration
-- **bini-overlay** — development tooling
-- **bini-ssg** — static site generation and route pre-rendering
-- **bini-deploy** — unified deployment for all platforms
-- **Oxlint** — fast Rust-based linting
-- **Oxfmt** — Prettier-compatible formatter
-
-- **TypeScript** — static type safety
-
----
-
-# Documentation
-
-https://bini.js.org
-
----
-
-Built with **Bini.js v10.0.6**
+</div>
