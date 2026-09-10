@@ -4,7 +4,7 @@ import './globals.css'
 export const metadata = {
   title: 'Island Link',
   description:
-    "Sri Lanka's Premier Island-to-Island Shopping Experience - Connecting You to Products Across the Islands",
+    'Sri Lankans Premier Island-to-Island Shopping Experience - Connecting You to Products Across the Islands',
   keywords: [
     'IslandLink',
     'e-commerce Sri Lanka',
@@ -21,7 +21,7 @@ export const metadata = {
   openGraph: {
     title: 'Island Link',
     description:
-      "Sri Lanka's Premier Island-to-Island Shopping Experience - Connecting You to Products Across the Islands",
+      'Sri Lankans Premier Island-to-Island Shopping Experience - Connecting You to Products Across the Islands',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
@@ -35,6 +35,7 @@ export const metadata = {
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
   },
 }
+
 
 // Root layout — wraps every page.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
