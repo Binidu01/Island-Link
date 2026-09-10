@@ -1,0 +1,6 @@
+allowBuilds:
+  '@firebase/util': true
+  esbuild: true
+  protobufjs: true
+minimumReleaseAgeExclude:
+  - bini-env@2.0.0
